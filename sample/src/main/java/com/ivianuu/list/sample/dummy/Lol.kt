@@ -26,7 +26,9 @@ import com.ivianuu.list.sample.R
 @Model class PlatformModel(
     private val context: Context
 ) : MyBaseModel() {
-    var platformType by property("platformType") { context.getString(R.string.abc_action_bar_home_description) }
+    var platformType by property("platformType") {
+        context.getString(R.string.abc_action_bar_home_description)!!
+    }
 }
 
 @Model internal class ConstructorModel(

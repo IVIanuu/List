@@ -71,14 +71,15 @@ internal fun ProtoBuf.TypeParameter.Variance.asKModifier(): KModifier? {
 internal fun Type.asTypeName(
     nameResolver: NameResolver,
     getTypeParameter: (index: Int) -> TypeParameter,
-    useAbbreviatedType: Boolean = true
+    useAbbreviatedType: Boolean = true,
+    allowFlexibleTypes: Boolean = true
 ): TypeName {
     val argumentList = when {
         useAbbreviatedType && hasAbbreviatedType() -> abbreviatedType.argumentList
         else -> argumentList
     }
 
-    if (hasFlexibleUpperBound()) {
+    if (allowFlexibleTypes && hasFlexibleUpperBound()) {
         return WildcardTypeName.producerOf(
             flexibleUpperBound.asTypeName(nameResolver, getTypeParameter, useAbbreviatedType)
         )
