@@ -19,7 +19,6 @@ package com.ivianuu.list
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.ivianuu.list.internal.hash64Bit
 
 /**
  * @author Manuel Wrage (IVIanuu)
@@ -37,8 +36,6 @@ abstract class ListModel<H : ModelHolder> {
     open val layoutRes = 0
 
     val properties = ModelProperties()
-
-    open val shouldSaveViewState = false
 
     private val listeners = mutableSetOf<ListModelListener>()
     private var superCalled = false
@@ -211,7 +208,7 @@ fun <T> ListModel<*>.setProperty(
 }
 
 fun ListModel<*>.id(id: Any?) {
-    this.id = id.hash64Bit()
+    this.id = id?.hashCode()?.toLong() ?: 0
 }
 
 fun <T : ListModel<*>> T.addTo(controller: ModelController): T {

@@ -128,6 +128,7 @@ class ListModelProcessingStep(
             element.simpleName.toString() + "ListExt",
             dslBuilderName,
             !element.modifiers.contains(Modifier.ABSTRACT),
+            false,
             constructorParams,
             properties
         )

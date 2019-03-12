@@ -26,6 +26,7 @@ data class ListModelDescriptor(
     val fileName: String,
     val dslBuilderName: String,
     val generateBuilder: Boolean,
+    val isInternal: Boolean,
     val constructorParams: List<ConstructorParamDescriptor>,
     val properties: List<ListPropertyDescriptor>
 )

@@ -16,10 +16,8 @@
 
 package com.ivianuu.list
 
-import android.os.Bundle
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.ivianuu.list.internal.ViewStateManager
 import java.util.*
 import java.util.concurrent.Executor
 
@@ -41,10 +39,6 @@ open class ModelAdapter(
      */
     val models: List<ListModel<*>> get() = helper.currentModels
 
-    val boundViewHolders: List<ModelViewHolder> get() = _boundViewHolders
-    private val _boundViewHolders = mutableListOf<ModelViewHolder>()
-    private val viewStateManager = ViewStateManager()
-
     init {
         setHasStableIds(true)
     }
@@ -52,7 +46,7 @@ open class ModelAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModelViewHolder {
         val model = models.first { it.viewType == viewType }
         val view = model.buildView(parent)
-        return ModelViewHolder(view, model.shouldSaveViewState)
+        return ModelViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ModelViewHolder, position: Int) {
@@ -66,18 +60,10 @@ open class ModelAdapter(
         super.onBindViewHolder(holder, position, payloads)
         val model = models[position]
         holder.bind(model)
-
-        if (payloads.isEmpty()) {
-            viewStateManager.restore(holder)
-        }
-
-        _boundViewHolders.add(holder)
     }
 
     override fun onViewRecycled(holder: ModelViewHolder) {
         super.onViewRecycled(holder)
-        viewStateManager.save(holder)
-        _boundViewHolders.remove(holder)
         holder.unbind()
     }
 
@@ -110,22 +96,6 @@ open class ModelAdapter(
         controller.detachedFromRecyclerView(recyclerView)
     }
 
-    fun saveState(): Bundle = Bundle().apply {
-        _boundViewHolders.forEach(viewStateManager::save)
-        putBundle(KEY_VIEW_STATE_MANAGER, viewStateManager.saveToBundle())
-    }
-
-    fun restoreState(savedState: Bundle?) {
-        check(_boundViewHolders.isEmpty()) {
-            "State cannot be restored once views have been bound"
-        }
-
-        if (savedState == null) return
-
-        savedState.getBundle(KEY_VIEW_STATE_MANAGER)!!
-            .let(viewStateManager::restoreFromBundle)
-    }
-
     final override fun setHasStableIds(hasStableIds: Boolean) {
         require(hasStableIds) { "This implementation relies on stable ids" }
         super.setHasStableIds(hasStableIds)
@@ -135,9 +105,6 @@ open class ModelAdapter(
         helper.submitModels(models.toList())
     }
 
-    private companion object {
-        private const val KEY_VIEW_STATE_MANAGER = "ModelAdapter.viewStateManager"
-    }
 }
 
 fun ModelAdapter.getModelAt(index: Int): ListModel<*> = models[index]
