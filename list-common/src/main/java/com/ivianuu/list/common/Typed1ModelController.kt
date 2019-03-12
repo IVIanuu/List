@@ -67,5 +67,5 @@ class SimpleTyped1ModelController<A>(
     }
 }
 
-fun <A> typed1Controller(buildModels: (A) -> Unit) =
+fun <A> typed1ModelController(buildModels: (A) -> Unit): SimpleTyped1ModelController<A> =
     SimpleTyped1ModelController(buildModels = buildModels)

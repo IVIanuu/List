@@ -35,5 +35,5 @@ class SimpleModelController(
     }
 }
 
-fun controller(buildModels: ModelController.() -> Unit) =
+fun modelController(buildModels: ModelController.() -> Unit): SimpleModelController =
     SimpleModelController(buildModels = buildModels)

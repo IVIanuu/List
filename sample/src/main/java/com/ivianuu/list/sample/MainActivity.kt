@@ -10,7 +10,7 @@ import com.ivianuu.list.annotations.Model
 import com.ivianuu.list.common.LayoutContainerHolder
 import com.ivianuu.list.common.LayoutContainerModel
 import com.ivianuu.list.common.ModelTouchHelper
-import com.ivianuu.list.common.controller
+import com.ivianuu.list.common.modelController
 import com.ivianuu.list.common.onClick
 import com.ivianuu.list.id
 import com.ivianuu.list.moveModel
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         list.layoutManager = LinearLayoutManager(this)
 
-        val controller = controller {
+        val controller = modelController {
             shuffle {
                 id("shuffle")
                 onClick(R.id.shuffle_button) { _, _ ->
