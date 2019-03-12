@@ -32,10 +32,6 @@ import java.util.*
 
 internal class ActivityRecyclerPool {
 
-    /**
-     * Store one unique pool per activity. They are cleared out when activities are destroyed, so this
-     * only needs to hold pools for active activities.
-     */
     private val pools = mutableListOf<PoolReference>()
 
     fun getPool(context: Context): PoolReference {
@@ -54,8 +50,6 @@ internal class ActivityRecyclerPool {
                     // finish iterating to remove any old contexts
                 }
                 poolReference.context.isActivityDestroyed() -> {
-                    // A pool from a different activity that was destroyed.
-                    // Clear the pool references to allow the activity to be GC'd
                     poolReference.viewPool.clear()
                     iterator.remove()
                 }
