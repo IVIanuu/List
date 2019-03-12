@@ -127,7 +127,8 @@ class ListModelProcessingStep(
                         properties.add(
                             ListPropertyDescriptor(
                                 propertyInType.returnType.asTypeName(
-                                    nameResolverForType, classProto::getTypeParameter, true, false
+                                    nameResolverForType, classProto::getTypeParameter,
+                                    useAbbreviatedType = true, allowFlexibleTypes = false
                                 ),
                                 propertyName,
                                 classProto.visibility == ProtoBuf.Visibility.INTERNAL
