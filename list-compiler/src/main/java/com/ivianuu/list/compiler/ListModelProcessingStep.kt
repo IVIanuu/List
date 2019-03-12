@@ -98,6 +98,7 @@ class ListModelProcessingStep(
                 val fieldName = field.simpleName.toString()
                     .replace("\$delegate", "")
 
+                // todo find a better way to check whether a function is internal or not
                 val setterFunction = type.enclosedElements
                     .filterIsInstance<ExecutableElement>()
                     .firstOrNull {
@@ -128,7 +129,7 @@ class ListModelProcessingStep(
             element.simpleName.toString() + "ListExt",
             dslBuilderName,
             !element.modifiers.contains(Modifier.ABSTRACT),
-            false,
+            false, // todo implement this
             constructorParams,
             properties
         )
