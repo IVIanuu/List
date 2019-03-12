@@ -98,13 +98,6 @@ class ListModelProcessingStep(
 
         val properties = mutableListOf<ListPropertyDescriptor>()
 
-        processingEnv.messager.printMessage(
-            Diagnostic.Kind.WARNING,
-            "process type ${element.simpleName} super types ${element.collectAllTypeMetadatas().map {
-                it.data.nameResolver.getString(it.data.classProto.fqName)
-            }}"
-        )
-
         for (metadataForType in element.collectAllTypeMetadatas()) {
             val nameResolverForType = metadataForType.data.nameResolver
             val classProtoForType = metadataForType.data.classProto
@@ -112,17 +105,13 @@ class ListModelProcessingStep(
             val typeName = nameResolverForType.getString(classProtoForType.fqName)
 
             for (propertyInType in classProtoForType.propertyList) {
-                val propertyName = nameResolverForType.getString(propertyInType.name)
-                processingEnv.messager.printMessage(
-                    Diagnostic.Kind.WARNING,
-                    "found property $propertyName in $typeName"
-                )
-
                 // no private fields
                 if (propertyInType.visibility == ProtoBuf.Visibility.PRIVATE) continue
 
                 // todo find a better way to check if its a ModelPropertyDelegate
                 if (propertyInType.isDelegated) {
+                    val propertyName = nameResolverForType.getString(propertyInType.name)
+
                     val typeElement = processingEnv.elementUtils
                         .getTypeElement(typeName.replace("/", "."))
 
@@ -157,12 +146,7 @@ class ListModelProcessingStep(
             isTypeInternal,
             constructorParams,
             properties
-        ).also {
-            processingEnv.messager.printMessage(
-                Diagnostic.Kind.WARNING,
-                "descriptor -> $it"
-            )
-        }
+        )
     }
 
     private fun TypeElement.collectAllTypeMetadatas(): List<KotlinClassMetadata> {
