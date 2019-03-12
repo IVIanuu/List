@@ -58,9 +58,6 @@ abstract class ModelController(
 
     private var requestedModelBuildType = RequestedModelBuildType.NONE
 
-    internal val modelListeners get() = _modelListeners
-    private val _modelListeners = mutableSetOf<ListModelListener>()
-
     private val listeners = mutableSetOf<ModelControllerListener>()
 
     open fun requestModelBuild() {
@@ -105,7 +102,6 @@ abstract class ModelController(
 
     protected fun add(models: Iterable<ListModel<*>>) {
         checkBuildingModels()
-        models.forEach { it.addedToController(this) }
         currentModels.addAll(models)
     }
 
@@ -135,11 +131,11 @@ abstract class ModelController(
     }
 
     fun addModelListener(listener: ListModelListener) {
-        _modelListeners.add(listener)
+        adapter.addModelListener(listener)
     }
 
     fun removeModelListener(listener: ListModelListener) {
-        _modelListeners.remove(listener)
+        adapter.removeModelListener(listener)
     }
 
     fun addListener(listener: ModelControllerListener) {

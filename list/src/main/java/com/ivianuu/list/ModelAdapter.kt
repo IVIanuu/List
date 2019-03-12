@@ -45,6 +45,9 @@ open class ModelAdapter(
      */
     val models: List<ListModel<*>> get() = helper.currentList
 
+    internal val modelListeners get() = _modelListeners
+    private val _modelListeners = mutableSetOf<ListModelListener>()
+
     init {
         setHasStableIds(true)
     }
@@ -108,7 +111,16 @@ open class ModelAdapter(
     }
 
     fun setModels(models: List<ListModel<*>>) {
+        models.forEach { it.addedToAdapter(this) }
         helper.submitList(models.toList())
+    }
+
+    fun addModelListener(listener: ListModelListener) {
+        _modelListeners.add(listener)
+    }
+
+    fun removeModelListener(listener: ListModelListener) {
+        _modelListeners.remove(listener)
     }
 
     private companion object {
