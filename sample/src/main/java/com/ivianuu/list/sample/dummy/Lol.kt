@@ -22,7 +22,9 @@ import com.ivianuu.list.common.LayoutContainerHolder
 import com.ivianuu.list.sample.MainActivity
 
 @Model internal class ConstructorModel(
-    private val lol: String
+    private val lol: String,
+    private val nullableSomething: Boolean?,
+    private val lambda: (String, Int) -> Unit
 ) : MyMiddleModel() {
     var tja by optionalProperty<MainActivity>("tja")
 }
@@ -39,5 +41,6 @@ import com.ivianuu.list.sample.MainActivity
 @Model
 abstract class MyBaseModel : ListModel<LayoutContainerHolder>() {
     var accessToken by requiredProperty<String>("accessToken")
+    var onMenuClick by optionalProperty<(Int, String) -> Unit>("onMenuClick")
     override fun onCreateHolder(): LayoutContainerHolder = LayoutContainerHolder()
 }

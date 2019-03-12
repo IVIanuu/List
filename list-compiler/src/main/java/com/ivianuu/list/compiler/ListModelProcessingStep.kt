@@ -16,27 +16,22 @@
 
 package com.ivianuu.list.compiler
 
-import com.google.auto.common.MoreTypes
 import com.google.common.collect.SetMultimap
 import com.ivianuu.list.annotations.Model
 import com.ivianuu.processingx.ProcessingStep
 import com.ivianuu.processingx.write
 import com.squareup.kotlinpoet.asClassName
-import com.squareup.kotlinpoet.asTypeName
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
-import me.eugeniomarletti.kotlin.metadata.isVal
+import me.eugeniomarletti.kotlin.metadata.isDelegated
+import me.eugeniomarletti.kotlin.metadata.isPrimary
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import me.eugeniomarletti.kotlin.metadata.setterVisibility
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.visibility
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
-import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
-import javax.lang.model.type.DeclaredType
 import javax.tools.Diagnostic
 
 class ListModelProcessingStep(
@@ -57,7 +52,20 @@ class ListModelProcessingStep(
     }
 
     private fun createDescriptor(element: TypeElement): ListModelDescriptor? {
-        // todo check if the element is a kotlin class and a list model
+        val metadata = element.kotlinMetadata as? KotlinClassMetadata
+
+        if (metadata == null) {
+            processingEnv.messager.printMessage(
+                Diagnostic.Kind.ERROR,
+                "@Model cannot be used in non kotlin classes", element
+            )
+            return null
+        }
+
+        val classProto = metadata.data.classProto
+        val nameResolver = metadata.data.nameResolver
+
+        // todo check if element is a list model
 
         val elementClass = element.asClassName()
 
@@ -67,95 +75,77 @@ class ListModelProcessingStep(
             elementClass.simpleName
         }.decapitalize()
 
-        val isTypeInternal = (element.kotlinMetadata as KotlinClassMetadata)
-            .data.classProto.visibility == ProtoBuf.Visibility.INTERNAL
+        val isTypeInternal = classProto.visibility == ProtoBuf.Visibility.INTERNAL
 
-        val constructorParams = element
-            .enclosedElements
-            .filterIsInstance<ExecutableElement>()
-            .first { it.kind == ElementKind.CONSTRUCTOR }
-            .parameters
-            .mapNotNull { param ->
-                val kotlinMetaData = (element.kotlinMetadata as KotlinClassMetadata)
-                val property = kotlinMetaData.data.classProto
-                    .constructorList
-                    .flatMap { it.valueParameterList }
-                    .firstOrNull {
-                        kotlinMetaData.data.nameResolver.getString(it.name) ==
-                                param.simpleName.toString()
-                    } ?: return@mapNotNull null
+        val constructor = classProto.constructorList
+            .firstOrNull { it.isPrimary }
 
-                val type = param.asType().asTypeName().javaToKotlinType()
-                    .let { it.copy(nullable = property.type.nullable) }
-
-                ConstructorParamDescriptor(
-                    type,
-                    param.simpleName.toString()
-                )
-            }
-
-        val superClasses = mutableListOf<TypeElement>()
-        var superClass = MoreTypes.nonObjectSuperclass(
-            processingEnv.typeUtils, processingEnv.elementUtils, element.asType() as DeclaredType
-        ).orNull()
-
-        while (superClass != null) {
-            superClasses.add(superClass.asElement() as TypeElement)
-            superClass = MoreTypes.nonObjectSuperclass(
-                processingEnv.typeUtils, processingEnv.elementUtils, superClass
-            ).orNull()
+        // todo what to do here
+        if (constructor == null) {
+            return null
         }
 
-        val properties = (listOf(element) + superClasses)
-            .flatMap { type ->
-                type.enclosedElements
-                    .filterIsInstance<VariableElement>()
-                    .map { type to it }
+        val constructorParams = constructor.valueParameterList
+            .mapNotNull { valueParam ->
+                ConstructorParamDescriptor(
+                    valueParam.type.asTypeName(
+                        nameResolver, classProto::getTypeParameter,
+                        true
+                    ),
+                    nameResolver.getString(valueParam.name)
+                )
             }
-            .filter { (_, field) ->
-                field.asType().asTypeName() == CLASS_MODEL_PROPERTY_DELEGATE
-                        && field.simpleName.toString().endsWith("\$delegate")
-            }
-            .mapNotNull { (type, field) ->
-                val fieldName = field.simpleName.toString()
-                    .replace("\$delegate", "")
 
-                val kotlinMetaData = (type.kotlinMetadata as KotlinClassMetadata)
-                val property = kotlinMetaData.data.classProto
-                    .propertyList.firstOrNull {
-                    kotlinMetaData.data.nameResolver.getString(it.name) == fieldName
-                } ?: return@mapNotNull null
+        val properties = mutableListOf<ListPropertyDescriptor>()
 
-                // ignore private setters
-                if (property.visibility == ProtoBuf.Visibility.PRIVATE) return@mapNotNull null
+        processingEnv.messager.printMessage(
+            Diagnostic.Kind.WARNING,
+            "process type ${element.simpleName} super types ${element.collectAllTypeMetadatas().map {
+                it.data.nameResolver.getString(it.data.classProto.fqName)
+            }}"
+        )
 
-                // ignore private setters
-                if (property.setterVisibility == ProtoBuf.Visibility.PRIVATE) return@mapNotNull null
+        for (metadataForType in element.collectAllTypeMetadatas()) {
+            val nameResolverForType = metadataForType.data.nameResolver
+            val classProtoForType = metadataForType.data.classProto
 
-                // ignore val
-                if (property.isVal) return@mapNotNull null
+            val typeName = nameResolverForType.getString(classProtoForType.fqName)
 
-                val isInternal =
-                    isTypeInternal || property.setterVisibility == ProtoBuf.Visibility.INTERNAL
-
-                val isNullable =
-                    property.returnType.nullable
-
+            for (propertyInType in classProtoForType.propertyList) {
+                val propertyName = nameResolverForType.getString(propertyInType.name)
                 processingEnv.messager.printMessage(
                     Diagnostic.Kind.WARNING,
-                    "property class name -> ${kotlinMetaData.data.nameResolver.getString(property.returnType.className)}"
+                    "found property $propertyName in $typeName"
                 )
 
-                val fieldType = type.enclosedElements
-                    .filterIsInstance<ExecutableElement>()
-                    .first { it.simpleName.startsWith("get${fieldName.capitalize()}") }
-                    .returnType
-                    .asTypeName()
-                    .javaToKotlinType()
-                    .let { it.copy(nullable = isNullable) }
+                // no private fields
+                if (propertyInType.visibility == ProtoBuf.Visibility.PRIVATE) continue
 
-                ListPropertyDescriptor(fieldType, fieldName, isInternal)
+                // todo find a better way to check if its a ModelPropertyDelegate
+                if (propertyInType.isDelegated) {
+                    val typeElement = processingEnv.elementUtils
+                        .getTypeElement(typeName.replace("/", "."))
+
+                    val delegateField = typeElement
+                        .enclosedElements
+                        .filterIsInstance<VariableElement>()
+                        .first { it.simpleName.toString() == "$propertyName\$delegate" }
+
+                    if (delegateField.asType().toString() == CLASS_MODEL_PROPERTY_DELEGATE.toString()) {
+                        properties.add(
+                            ListPropertyDescriptor(
+                                propertyInType.returnType.asTypeName(
+                                    nameResolverForType, classProto::getTypeParameter, true
+                                ),
+                                propertyName,
+                                classProto.visibility == ProtoBuf.Visibility.INTERNAL
+                                        || propertyInType.visibility == ProtoBuf.Visibility.INTERNAL
+                            )
+                        )
+                    }
+                }
             }
+        }
 
         return ListModelDescriptor(
             element,
@@ -173,5 +163,26 @@ class ListModelProcessingStep(
                 "descriptor -> $it"
             )
         }
+    }
+
+    private fun TypeElement.collectAllTypeMetadatas(): List<KotlinClassMetadata> {
+        val allTypes = mutableListOf<KotlinClassMetadata>()
+
+        var currentElement: TypeElement? = this
+
+        while (currentElement != null) {
+            val metadata = currentElement.kotlinMetadata as? KotlinClassMetadata ?: break
+            allTypes.add(metadata)
+            currentElement = metadata.data.classProto.supertypeList
+                .mapNotNull {
+                    processingEnv.elementUtils.getTypeElement(
+                        metadata.data.nameResolver.getString(it.className)
+                            .replace("/", ".")
+                    )
+                }
+                .firstOrNull()
+        }
+
+        return allTypes
     }
 }

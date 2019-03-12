@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
                     requestImmediateModelBuild()
                 }
             }
+
             models.forEach {
                 simple {
                     id(it)
