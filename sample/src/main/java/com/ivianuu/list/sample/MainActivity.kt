@@ -13,6 +13,7 @@ import com.ivianuu.list.common.ModelTouchHelper
 import com.ivianuu.list.common.controller
 import com.ivianuu.list.common.onClick
 import com.ivianuu.list.id
+import com.ivianuu.list.moveModel
 import kotlinx.android.synthetic.main.activity_main.list
 import kotlinx.android.synthetic.main.item_simple.title
 import java.util.*
@@ -30,18 +31,25 @@ class MainActivity : AppCompatActivity() {
         list.layoutManager = LinearLayoutManager(this)
 
         val controller = controller {
+            shuffle {
+                id("shuffle")
+                onClick(R.id.shuffle_button) { _, _ ->
+                    models.shuffle()
+                    requestImmediateModelBuild()
+                }
+            }
             models.forEach {
-                    simple {
-                        id(it)
-                        text(it)
-                        onClick { _, _ ->
-                            Toast.makeText(
-                                this@MainActivity, "Clicked model at $it",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                simple {
+                    id(it)
+                    text(it)
+                    onClick { _, _ ->
+                        Toast.makeText(
+                            this@MainActivity, "Clicked model at $it",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
+            }
         }
 
         controller.requestModelBuild()
@@ -61,11 +69,15 @@ class MainActivity : AppCompatActivity() {
                     ) {
                         super.onModelMoved(fromPosition, toPosition, modelBeingMoved, itemView)
                         Collections.swap(models, fromPosition, toPosition)
-                        controller.requestImmediateModelBuild()
+                        controller.adapter.moveModel(fromPosition, toPosition)
                     }
                 }
             )
     }
+}
+
+@Model class ShuffleModel : LayoutContainerModel() {
+    override val layoutRes = R.layout.item_shuffle
 }
 
 @Model class SimpleModel : LayoutContainerModel() {
