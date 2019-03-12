@@ -18,7 +18,6 @@ package com.ivianuu.list.compiler
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeName
@@ -31,22 +30,9 @@ import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.TypeParameter
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.TypeParameter.Variance.INV
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.TypeParameter.Variance.OUT
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.NameResolver
-import me.eugeniomarletti.kotlin.metadata.shadow.name.FqName
-import me.eugeniomarletti.kotlin.metadata.shadow.platform.JavaToKotlinClassMap
 
 val CLASS_MODEL_CONTROLLER = ClassName("com.ivianuu.list", "ModelController")
 val CLASS_MODEL_PROPERTY_DELEGATE = ClassName("com.ivianuu.list", "ModelPropertyDelegate")
-
-fun TypeName.javaToKotlinType(): TypeName = if (this is ParameterizedTypeName) {
-    (rawType.javaToKotlinType() as ClassName).parameterizedBy(
-        *typeArguments.map(TypeName::javaToKotlinType).toTypedArray()
-    )
-} else {
-    val className = JavaToKotlinClassMap
-        .mapJavaToKotlin(FqName(toString()))?.asSingleFqName()?.asString()
-    if (className == null) this
-    else ClassName.bestGuess(className)
-}
 
 internal fun ProtoBuf.TypeParameter.asTypeName(
     nameResolver: NameResolver,
