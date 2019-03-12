@@ -119,9 +119,6 @@ abstract class ModelController(
     protected open fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
     }
 
-    protected open fun onModelsBuildResult(result: DiffResult) {
-    }
-
     @PublishedApi
     internal fun addInternal(model: ListModel<*>) {
         add(model)
@@ -135,11 +132,6 @@ abstract class ModelController(
     internal fun detachedFromRecyclerView(recyclerView: RecyclerView) {
         onDetachedFromRecyclerView(recyclerView)
         notifyListeners { it.onDetachedFromRecyclerView(this, recyclerView) }
-    }
-
-    internal fun modelsBuildResult(result: DiffResult) {
-        onModelsBuildResult(result)
-        notifyListeners { it.onModelsBuildResult(this, result) }
     }
 
     fun addModelListener(listener: ListModelListener) {
@@ -168,11 +160,6 @@ abstract class ModelController(
 
     private enum class RequestedModelBuildType {
         NONE, NEXT_FRAME, DELAYED
-    }
-
-    private companion object {
-        private const val KEY_ADAPTER_STATE = "ModelController.adapter"
-        private const val KEY_INSTANCE_STATE = "ModelController.instanceState"
     }
 
 }

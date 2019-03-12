@@ -29,12 +29,6 @@ interface ModelControllerListener {
     fun onDetachedFromRecyclerView(controller: ModelController, recyclerView: RecyclerView) {
     }
 
-    fun onInterceptBuildModels(controller: ModelController, models: MutableList<ListModel<*>>) {
-    }
-
-    fun onModelsBuildResult(controller: ModelController, result: DiffResult) {
-    }
-
 }
 
 fun ModelController.doOnAttachedToRecyclerView(
@@ -45,41 +39,23 @@ fun ModelController.doOnDetachedFromRecyclerView(
     block: (controller: ModelController, recyclerView: RecyclerView) -> Unit
 ): ModelControllerListener = addListener(onDetachedFromRecyclerView = block)
 
-fun ModelController.doOnInterceptBuildModels(
-    block: (controller: ModelController, models: MutableList<ListModel<*>>) -> Unit
-): ModelControllerListener = addListener(onInterceptBuildModels = block)
-
-fun ModelController.doOnModelsBuildResult(
-    block: (controller: ModelController, result: DiffResult) -> Unit
-): ModelControllerListener = addListener(onModelsBuildResult = block)
-
 fun ModelController.addListener(
     onAttachedToRecyclerView: ((controller: ModelController, recyclerView: RecyclerView) -> Unit)? = null,
-    onDetachedFromRecyclerView: ((controller: ModelController, recyclerView: RecyclerView) -> Unit)? = null,
-    onInterceptBuildModels: ((controller: ModelController, models: MutableList<ListModel<*>>) -> Unit)? = null,
-    onModelsBuildResult: ((controller: ModelController, result: DiffResult) -> Unit)? = null
+    onDetachedFromRecyclerView: ((controller: ModelController, recyclerView: RecyclerView) -> Unit)? = null
 ): ModelControllerListener = ListControllerListener(
-    onAttachedToRecyclerView, onDetachedFromRecyclerView,
-    onInterceptBuildModels,
-    onModelsBuildResult
+    onAttachedToRecyclerView, onDetachedFromRecyclerView
 ).also(this::addListener)
 
 fun ListControllerListener(
     onAttachedToRecyclerView: ((controller: ModelController, recyclerView: RecyclerView) -> Unit)? = null,
-    onDetachedFromRecyclerView: ((controller: ModelController, recyclerView: RecyclerView) -> Unit)? = null,
-    onInterceptBuildModels: ((controller: ModelController, models: MutableList<ListModel<*>>) -> Unit)? = null,
-    onModelsBuildResult: ((controller: ModelController, result: DiffResult) -> Unit)? = null
+    onDetachedFromRecyclerView: ((controller: ModelController, recyclerView: RecyclerView) -> Unit)? = null
 ): ModelControllerListener = LambdaModelControllerListener(
-    onAttachedToRecyclerView, onDetachedFromRecyclerView,
-    onInterceptBuildModels,
-    onModelsBuildResult
+    onAttachedToRecyclerView, onDetachedFromRecyclerView
 )
 
 class LambdaModelControllerListener(
     private val onAttachedToRecyclerView: ((controller: ModelController, recyclerView: RecyclerView) -> Unit)? = null,
-    private val onDetachedFromRecyclerView: ((controller: ModelController, recyclerView: RecyclerView) -> Unit)? = null,
-    private val onInterceptBuildModels: ((controller: ModelController, models: MutableList<ListModel<*>>) -> Unit)? = null,
-    private val onModelsBuildResult: ((controller: ModelController, result: DiffResult) -> Unit)? = null
+    private val onDetachedFromRecyclerView: ((controller: ModelController, recyclerView: RecyclerView) -> Unit)? = null
 ) : ModelControllerListener {
 
     override fun onAttachedToRecyclerView(controller: ModelController, recyclerView: RecyclerView) {
@@ -91,17 +67,6 @@ class LambdaModelControllerListener(
         recyclerView: RecyclerView
     ) {
         onDetachedFromRecyclerView?.invoke(controller, recyclerView)
-    }
-
-    override fun onInterceptBuildModels(
-        controller: ModelController,
-        models: MutableList<ListModel<*>>
-    ) {
-        onInterceptBuildModels?.invoke(controller, models)
-    }
-
-    override fun onModelsBuildResult(controller: ModelController, result: DiffResult) {
-        onModelsBuildResult?.invoke(controller, result)
     }
 
 }

@@ -17,6 +17,10 @@
 package com.ivianuu.list
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AdapterListUpdateCallback
+import androidx.recyclerview.widget.AsyncDifferConfig
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 import java.util.concurrent.Executor
@@ -29,15 +33,17 @@ open class ModelAdapter(
     diffingExecutor: Executor
 ) : RecyclerView.Adapter<ModelViewHolder>() {
 
-    private val helper = AsyncModelDiffer(diffingExecutor) { result ->
-        result.dispatchTo(this)
-        controller.modelsBuildResult(result)
-    }
+    private val helper = AsyncListDiffer<ListModel<*>>(
+        AdapterListUpdateCallback(this),
+        AsyncDifferConfig.Builder(DIFF_CALLBACK)
+            .setBackgroundThreadExecutor(diffingExecutor)
+            .build()
+    )
 
     /**
      * All current models
      */
-    val models: List<ListModel<*>> get() = helper.currentModels
+    val models: List<ListModel<*>> get() = helper.currentList
 
     init {
         setHasStableIds(true)
@@ -102,9 +108,18 @@ open class ModelAdapter(
     }
 
     fun setModels(models: List<ListModel<*>>) {
-        helper.submitModels(models.toList())
+        helper.submitList(models.toList())
     }
 
+    private companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListModel<*>>() {
+            override fun areItemsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>) =
+                oldItem.id == newItem.id
+
+            override fun areContentsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>) =
+                oldItem == newItem
+        }
+    }
 }
 
 fun ModelAdapter.getModelAt(index: Int): ListModel<*> = models[index]
