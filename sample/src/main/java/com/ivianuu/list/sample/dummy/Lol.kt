@@ -16,10 +16,18 @@
 
 package com.ivianuu.list.sample.dummy
 
+import android.content.Context
 import com.ivianuu.list.ListModel
 import com.ivianuu.list.annotations.Model
 import com.ivianuu.list.common.LayoutContainerHolder
 import com.ivianuu.list.sample.MainActivity
+import com.ivianuu.list.sample.R
+
+@Model class PlatformModel(
+    private val context: Context
+) : MyBaseModel() {
+    var platformType by property("platformType") { context.getString(R.string.abc_action_bar_home_description) }
+}
 
 @Model internal class ConstructorModel(
     private val lol: String,
@@ -27,6 +35,8 @@ import com.ivianuu.list.sample.MainActivity
     private val lambda: (String, Int) -> Unit
 ) : MyMiddleModel() {
     var tja by optionalProperty<MainActivity>("tja")
+
+    val hehe by property("lol") { 9 }
 }
 
 @Model class MySimpleModel : MyMiddleModel() {

@@ -24,6 +24,7 @@ import com.squareup.kotlinpoet.asClassName
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDelegated
 import me.eugeniomarletti.kotlin.metadata.isPrimary
+import me.eugeniomarletti.kotlin.metadata.isVal
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.visibility
@@ -107,6 +108,8 @@ class ListModelProcessingStep(
             for (propertyInType in classProtoForType.propertyList) {
                 // no private fields
                 if (propertyInType.visibility == ProtoBuf.Visibility.PRIVATE) continue
+
+                if (propertyInType.isVal) continue
 
                 // todo find a better way to check if its a ModelPropertyDelegate
                 if (propertyInType.isDelegated) {
