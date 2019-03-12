@@ -27,7 +27,7 @@ abstract class ListModel<H : ModelHolder> {
 
     var id: Long = -1
         internal set(value) {
-            check(!addedToAdapter) { "cannot change the id of an added model" }
+            check(!addedToController) { "cannot change the id of an added model" }
             field = value
         }
 
@@ -40,9 +40,8 @@ abstract class ListModel<H : ModelHolder> {
     private val listeners = mutableSetOf<ListModelListener>()
     private var superCalled = false
 
-    private lateinit var adapter: ModelAdapter
-    private var addedToAdapter = false
-    private var blockMutations = false
+    private lateinit var controller: ModelController
+    private var addedToController = false
 
     protected abstract fun onCreateHolder(): H
 
@@ -140,23 +139,19 @@ abstract class ListModel<H : ModelHolder> {
         return result
     }
 
-    internal fun addedToAdapter(adapter: ModelAdapter) {
-        check(!addedToAdapter) {
-            "already added to a adapter ${this.adapter} cannot add to $adapter"
+    internal fun addedToController(controller: ModelController) {
+        check(!addedToController) {
+            "already added to a controller ${this.controller} cannot add to $controller"
         }
         check(id != 0L) { "id must be set" }
 
-        this.adapter = adapter
-        addedToAdapter = true
-    }
-
-    internal fun blockMutations() {
-        blockMutations = true
+        this.controller = controller
+        addedToController = true
         properties.blockMutations()
     }
 
     private inline fun notifyListeners(block: (ListModelListener) -> Unit) {
-        (adapter.modelListeners + listeners.toList()).forEach(block)
+        (controller.adapter.modelListeners + listeners.toList()).forEach(block)
     }
 
     private inline fun requireSuperCalled(block: () -> Unit) {

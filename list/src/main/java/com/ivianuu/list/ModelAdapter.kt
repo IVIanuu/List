@@ -111,7 +111,6 @@ open class ModelAdapter(
     }
 
     fun setModels(models: List<ListModel<*>>) {
-        models.forEach { it.addedToAdapter(this) }
         helper.submitList(models.toList())
     }
 
@@ -125,10 +124,10 @@ open class ModelAdapter(
 
     private companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListModel<*>>() {
-            override fun areItemsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>) =
+            override fun areItemsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>): Boolean =
                 oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>) =
+            override fun areContentsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>): Boolean =
                 oldItem == newItem
         }
     }

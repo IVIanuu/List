@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.ivianuu.list.ListModel
 import com.ivianuu.list.annotations.Model
 import com.ivianuu.list.common.LayoutContainerHolder
@@ -14,7 +15,9 @@ import com.ivianuu.list.common.modelController
 import com.ivianuu.list.common.onClick
 import com.ivianuu.list.id
 import com.ivianuu.list.moveModel
+import com.ivianuu.list.removeModel
 import kotlinx.android.synthetic.main.activity_main.list
+import kotlinx.android.synthetic.main.item_button.button
 import kotlinx.android.synthetic.main.item_simple.title
 import java.util.*
 
@@ -31,11 +34,21 @@ class MainActivity : AppCompatActivity() {
         list.layoutManager = LinearLayoutManager(this)
 
         val controller = modelController {
-            shuffle {
+            button {
                 id("shuffle")
-                onClick(R.id.shuffle_button) { _, _ ->
+                buttonText("Shuffle")
+                onClick(R.id.button) { _, _ ->
                     models.shuffle()
-                    requestImmediateModelBuild()
+                    requestModelBuild()
+                }
+            }
+
+            button {
+                id("add_random")
+                buttonText("Add Random")
+                onClick(R.id.button) { _, _ ->
+                    models.add(0, "Random ${UUID.randomUUID()}")
+                    requestModelBuild()
                 }
             }
 
@@ -53,9 +66,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        controller.requestModelBuild()
-
         list.adapter = controller.adapter
+
+        controller.adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                println("on changed")
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                println("on item range changed position start: $positionStart, item count: $itemCount")
+            }
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                println("on item range inserted position start: $positionStart, item count: $itemCount")
+            }
+
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                println("on item range moved from position: $fromPosition, to position: $toPosition, item count: $itemCount")
+            }
+
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                println("on item range removed position start: $positionStart, item count: $itemCount")
+            }
+        })
 
         ModelTouchHelper.dragging(list)
             .vertical()
@@ -74,11 +107,37 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             )
+
+        ModelTouchHelper.swiping(list)
+            .leftAndRight()
+            .all()
+            .callbacks(
+                object : ModelTouchHelper.SwipeCallbacks<ListModel<*>>() {
+                    override fun onSwipeCompleted(
+                        model: ListModel<*>,
+                        itemView: View,
+                        position: Int,
+                        direction: Int
+                    ) {
+                        super.onSwipeCompleted(model, itemView, position, direction)
+                        models.removeAt(position)
+                        controller.adapter.removeModel(model)
+                    }
+                }
+            )
+
+        controller.requestModelBuild()
     }
 }
 
-@Model class ShuffleModel : LayoutContainerModel() {
-    override val layoutRes = R.layout.item_shuffle
+@Model class ButtonModel : LayoutContainerModel() {
+    var buttonText by requiredProperty<String>("buttonText")
+    override val layoutRes = R.layout.item_button
+
+    override fun onBind(holder: LayoutContainerHolder) {
+        super.onBind(holder)
+        holder.button.text = buttonText
+    }
 }
 
 @Model class SimpleModel : LayoutContainerModel() {

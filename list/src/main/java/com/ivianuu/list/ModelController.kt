@@ -101,12 +101,17 @@ abstract class ModelController(
     protected abstract fun buildModels()
 
     protected fun add(models: Iterable<ListModel<*>>) {
-        checkBuildingModels()
-        currentModels.addAll(models)
+        models.forEach(this::add)
     }
 
     protected fun add(vararg models: ListModel<*>) {
-        add(models.asIterable())
+        models.forEach(this::add)
+    }
+
+    private fun add(model: ListModel<*>) {
+        checkBuildingModels()
+        model.addedToController(this)
+        currentModels.add(model)
     }
 
     protected open fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
