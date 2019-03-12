@@ -39,5 +39,6 @@ data class ListPropertyDescriptor(
 
 data class ConstructorParamDescriptor(
     val param: TypeName,
-    val name: String
+    val name: String,
+    val isNoInline: Boolean
 )

@@ -88,12 +88,15 @@ class ListModelProcessingStep(
 
         val constructorParams = constructor.valueParameterList
             .mapNotNull { valueParam ->
+                val typeName = valueParam.type.asTypeName(
+                    nameResolver, classProto::getTypeParameter,
+                    true
+                )
                 ConstructorParamDescriptor(
-                    valueParam.type.asTypeName(
-                        nameResolver, classProto::getTypeParameter,
-                        true
-                    ),
-                    nameResolver.getString(valueParam.name)
+                    typeName,
+                    nameResolver.getString(valueParam.name),
+                    // todo this is ugly find a better way
+                    typeName.toString().startsWith("kotlin.Function")
                 )
             }
 

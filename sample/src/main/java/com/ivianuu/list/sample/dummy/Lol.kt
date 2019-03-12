@@ -27,7 +27,7 @@ import com.ivianuu.list.sample.R
     private val context: Context
 ) : MyBaseModel() {
     var platformType by property("platformType") {
-        context.getString(R.string.abc_action_bar_home_description)!!
+        context.getString(R.string.abc_action_bar_home_description)
     }
 }
 

@@ -44,6 +44,7 @@ class ListGenerator(private val descriptor: ListModelDescriptor) {
 
     private fun listControllerDslBuilder(): FunSpec {
         return FunSpec.builder(descriptor.dslBuilderName)
+            .addModifiers(KModifier.INLINE)
             .apply {
                 if (descriptor.isInternal) {
                     addModifiers(KModifier.INTERNAL)
@@ -51,7 +52,10 @@ class ListGenerator(private val descriptor: ListModelDescriptor) {
             }
             .apply {
                 descriptor.constructorParams.forEach { param ->
-                    addParameter(param.name, param.param)
+                    addParameter(
+                        param.name, param.param,
+                        *(if (param.isNoInline) arrayOf(KModifier.NOINLINE) else emptyArray())
+                    )
                 }
             }
             .addParameter(
