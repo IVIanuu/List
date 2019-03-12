@@ -1,0 +1,1 @@
+C:\Users\ivian\AndroidStudioProjects\List\buildSrc\build\classes\kotlin\main\Build.class;C:\Users\ivian\AndroidStudioProjects\List\buildSrc\build\classes\kotlin\main\Deps.class;C:\Users\ivian\AndroidStudioProjects\List\buildSrc\build\classes\kotlin\main\Publishing.class;C:\Users\ivian\AndroidStudioProjects\List\buildSrc\build\classes\kotlin\main\Versions.class

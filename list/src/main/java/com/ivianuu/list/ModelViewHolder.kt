@@ -1,0 +1,70 @@
+/*
+ * Copyright 2018 Manuel Wrage
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.ivianuu.list
+
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import com.ivianuu.list.internal.ViewStateManager
+
+/**
+ * View holder used by [ModelAdapter]s
+ */
+class ModelViewHolder(
+    itemView: View,
+    shouldSaveInitialViewState: Boolean
+) : RecyclerView.ViewHolder(itemView) {
+
+    var model: ListModel<ModelHolder>? = null
+        private set
+
+    lateinit var holder: ModelHolder
+        private set
+    private var holderCreated = false
+
+    private var initialViewState: ViewStateManager.ViewState? = null
+
+    init {
+        if (shouldSaveInitialViewState) {
+            initialViewState = ViewStateManager.ViewState()
+                .also { it.save(itemView) }
+        }
+    }
+
+    internal fun bind(model: ListModel<*>) {
+        this.model = model as ListModel<ModelHolder>
+
+        if (!holderCreated) {
+            holderCreated = true
+            holder = model.createHolder()
+            holder.bindView(itemView)
+        }
+
+        model.bind(holder)
+    }
+
+    internal fun unbind() {
+        model?.unbind(holder)
+        model = null
+    }
+
+    internal fun restoreInitialViewState() {
+        initialViewState?.restore(itemView)
+    }
+
+}
+
+fun ModelViewHolder.requireModel(): ListModel<ModelHolder> = model ?: error("model is null")
