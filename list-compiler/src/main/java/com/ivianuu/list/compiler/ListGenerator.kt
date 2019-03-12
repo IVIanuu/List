@@ -45,6 +45,11 @@ class ListGenerator(private val descriptor: ListModelDescriptor) {
     private fun listControllerDslBuilder(): FunSpec {
         return FunSpec.builder(descriptor.dslBuilderName)
             .apply {
+                if (descriptor.isInternal) {
+                    addModifiers(KModifier.INTERNAL)
+                }
+            }
+            .apply {
                 descriptor.constructorParams.forEach { param ->
                     addParameter(param.name, param.param)
                 }
@@ -56,7 +61,8 @@ class ListGenerator(private val descriptor: ListModelDescriptor) {
                         descriptor.listModel,
                         returnType = Unit::class.asTypeName()
                     )
-                ).build()
+                )
+                    .build()
             )
             .receiver(CLASS_MODEL_CONTROLLER)
             .returns(descriptor.listModel)

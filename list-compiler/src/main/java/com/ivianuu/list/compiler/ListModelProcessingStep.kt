@@ -23,6 +23,12 @@ import com.ivianuu.processingx.ProcessingStep
 import com.ivianuu.processingx.write
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
+import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
+import me.eugeniomarletti.kotlin.metadata.isVal
+import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
+import me.eugeniomarletti.kotlin.metadata.setterVisibility
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
+import me.eugeniomarletti.kotlin.metadata.visibility
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
@@ -31,6 +37,7 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.DeclaredType
+import javax.tools.Diagnostic
 
 class ListModelProcessingStep(
     private val processingEnv: ProcessingEnvironment
@@ -60,14 +67,29 @@ class ListModelProcessingStep(
             elementClass.simpleName
         }.decapitalize()
 
+        val isTypeInternal = (element.kotlinMetadata as KotlinClassMetadata)
+            .data.classProto.visibility == ProtoBuf.Visibility.INTERNAL
+
         val constructorParams = element
             .enclosedElements
             .filterIsInstance<ExecutableElement>()
             .first { it.kind == ElementKind.CONSTRUCTOR }
             .parameters
-            .map { param ->
+            .mapNotNull { param ->
+                val kotlinMetaData = (element.kotlinMetadata as KotlinClassMetadata)
+                val property = kotlinMetaData.data.classProto
+                    .constructorList
+                    .flatMap { it.valueParameterList }
+                    .firstOrNull {
+                        kotlinMetaData.data.nameResolver.getString(it.name) ==
+                                param.simpleName.toString()
+                    } ?: return@mapNotNull null
+
+                val type = param.asType().asTypeName().javaToKotlinType()
+                    .let { it.copy(nullable = property.type.nullable) }
+
                 ConstructorParamDescriptor(
-                    param.asType().asTypeName().javaToKotlinType(),
+                    type,
                     param.simpleName.toString()
                 )
             }
@@ -98,19 +120,31 @@ class ListModelProcessingStep(
                 val fieldName = field.simpleName.toString()
                     .replace("\$delegate", "")
 
-                // todo find a better way to check whether a function is internal or not
-                val setterFunction = type.enclosedElements
-                    .filterIsInstance<ExecutableElement>()
-                    .firstOrNull {
-                        it.simpleName.toString().startsWith("set${fieldName.capitalize()}")
-                    }
+                val kotlinMetaData = (type.kotlinMetadata as KotlinClassMetadata)
+                val property = kotlinMetaData.data.classProto
+                    .propertyList.firstOrNull {
+                    kotlinMetaData.data.nameResolver.getString(it.name) == fieldName
+                } ?: return@mapNotNull null
 
-                if (setterFunction == null || setterFunction.modifiers.contains(Modifier.PRIVATE)) {
-                    return@mapNotNull null
-                }
+                // ignore private setters
+                if (property.visibility == ProtoBuf.Visibility.PRIVATE) return@mapNotNull null
+
+                // ignore private setters
+                if (property.setterVisibility == ProtoBuf.Visibility.PRIVATE) return@mapNotNull null
+
+                // ignore val
+                if (property.isVal) return@mapNotNull null
 
                 val isInternal =
-                    setterFunction.simpleName.toString() != "set${fieldName.capitalize()}"
+                    isTypeInternal || property.setterVisibility == ProtoBuf.Visibility.INTERNAL
+
+                val isNullable =
+                    property.returnType.nullable
+
+                processingEnv.messager.printMessage(
+                    Diagnostic.Kind.WARNING,
+                    "property class name -> ${kotlinMetaData.data.nameResolver.getString(property.returnType.className)}"
+                )
 
                 val fieldType = type.enclosedElements
                     .filterIsInstance<ExecutableElement>()
@@ -118,6 +152,7 @@ class ListModelProcessingStep(
                     .returnType
                     .asTypeName()
                     .javaToKotlinType()
+                    .let { it.copy(nullable = isNullable) }
 
                 ListPropertyDescriptor(fieldType, fieldName, isInternal)
             }
@@ -129,9 +164,14 @@ class ListModelProcessingStep(
             element.simpleName.toString() + "ListExt",
             dslBuilderName,
             !element.modifiers.contains(Modifier.ABSTRACT),
-            false, // todo implement this
+            isTypeInternal,
             constructorParams,
             properties
-        )
+        ).also {
+            processingEnv.messager.printMessage(
+                Diagnostic.Kind.WARNING,
+                "descriptor -> $it"
+            )
+        }
     }
 }

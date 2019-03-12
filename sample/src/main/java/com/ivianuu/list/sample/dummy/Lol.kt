@@ -21,7 +21,7 @@ import com.ivianuu.list.annotations.Model
 import com.ivianuu.list.common.LayoutContainerHolder
 import com.ivianuu.list.sample.MainActivity
 
-@Model class ConstructorModel(
+@Model internal class ConstructorModel(
     private val lol: String
 ) : MyMiddleModel() {
     var tja by optionalProperty<MainActivity>("tja")
