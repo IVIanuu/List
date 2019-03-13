@@ -54,7 +54,8 @@ class ModelProperties internal constructor() {
 
     internal fun modelAdded() {
         // force init of all delegates to have consistent equals() and hashCode() results
-        uninitializedDelegates.forEach { it.value.initializeValue() }
+        uninitializedDelegates.values.toList()
+            .forEach(ModelPropertyDelegate<*>::initializeValue)
         uninitializedDelegates.clear()
 
         modelAdded = true
