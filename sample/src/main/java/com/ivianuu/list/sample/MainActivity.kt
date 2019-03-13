@@ -133,7 +133,6 @@ class MainActivity : AppCompatActivity() {
 @Model class ButtonModel : LayoutContainerModel() {
     var buttonText by requiredProperty<String>("buttonText")
     override val layoutRes = R.layout.item_button
-
     override fun onBind(holder: LayoutContainerHolder) {
         super.onBind(holder)
         holder.button.text = buttonText

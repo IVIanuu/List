@@ -66,15 +66,15 @@ abstract class Typed1ModelController<A>(
  * Simple [Typed1ModelController] which uses the [buildModels] block
  */
 class SimpleTyped1ModelController<A>(
-    private val buildModels: (A) -> Unit
+    private val buildModels: Typed1ModelController<A>.(A) -> Unit
 ) : Typed1ModelController<A>() {
     override fun buildModels(data1: A) {
-        buildModels.invoke(data1)
+        buildModels.invoke(this, data1)
     }
 }
 
 /**
  * Returns a [SimpleTyped1ModelController] which uses [buildModels] to build it's models
  */
-fun <A> typed1ModelController(buildModels: (A) -> Unit): SimpleTyped1ModelController<A> =
+fun <A> typed1ModelController(buildModels: Typed1ModelController<A>.(data: A) -> Unit): SimpleTyped1ModelController<A> =
     SimpleTyped1ModelController(buildModels = buildModels)
