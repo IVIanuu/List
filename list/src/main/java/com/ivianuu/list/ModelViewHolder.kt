@@ -24,9 +24,15 @@ import androidx.recyclerview.widget.RecyclerView
  */
 class ModelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+    /**
+     * The current bound model if any
+     */
     var model: ListModel<ModelHolder>? = null
         private set
 
+    /**
+     * The underlying model holder
+     */
     lateinit var holder: ModelHolder
         private set
     private var holderCreated = false
@@ -50,4 +56,7 @@ class ModelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
 }
 
+/**
+ * Returns the currently bound model or throws
+ */
 fun ModelViewHolder.requireModel(): ListModel<ModelHolder> = model ?: error("model is null")

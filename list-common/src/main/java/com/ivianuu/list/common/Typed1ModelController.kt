@@ -23,7 +23,7 @@ import com.ivianuu.list.defaultDiffingExecutor
 import java.util.concurrent.Executor
 
 /**
- * @author Manuel Wrage (IVIanuu)
+ * Typed [ModelController]
  */
 abstract class Typed1ModelController<A>(
     diffingExecutor: Executor = ListPlugins.defaultDiffingExecutor,
@@ -55,10 +55,16 @@ abstract class Typed1ModelController<A>(
         buildModels(data1!!)
     }
 
+    /**
+     * Builds a list of models for the [data1]
+     */
     protected abstract fun buildModels(data1: A)
 
 }
 
+/**
+ * Simple [Typed1ModelController] which uses the [buildModels] block
+ */
 class SimpleTyped1ModelController<A>(
     private val buildModels: (A) -> Unit
 ) : Typed1ModelController<A>() {
@@ -67,5 +73,8 @@ class SimpleTyped1ModelController<A>(
     }
 }
 
+/**
+ * Returns a [SimpleTyped1ModelController] which uses [buildModels] to build it's models
+ */
 fun <A> typed1ModelController(buildModels: (A) -> Unit): SimpleTyped1ModelController<A> =
     SimpleTyped1ModelController(buildModels = buildModels)

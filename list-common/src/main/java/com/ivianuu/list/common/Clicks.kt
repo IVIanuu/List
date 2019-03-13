@@ -20,6 +20,9 @@ import android.view.View
 import com.ivianuu.list.ListModel
 import com.ivianuu.list.addListener
 
+/**
+ * Notifies the [block] on each click to the result of [viewProvider]
+ */
 fun <T : ListModel<*>> T.onClick(
     viewProvider: (View) -> View = { it },
     block: (model: T, view: View) -> Unit
@@ -31,6 +34,9 @@ fun <T : ListModel<*>> T.onClick(
     )
 }
 
+/**
+ * Notifies the [block] on each click on the view with the [viewId]
+ */
 fun <T : ListModel<*>> T.onClick(
     viewId: Int,
     block: (model: T, view: View) -> Unit
@@ -38,6 +44,9 @@ fun <T : ListModel<*>> T.onClick(
     onClick({ it.findViewById(viewId) }, block)
 }
 
+/**
+ * Notifies the [block] on each long click to the result of [viewProvider]
+ */
 fun <T : ListModel<*>> T.onLongClick(
     viewProvider: (View) -> View = { it },
     block: (model: T, view: View) -> Boolean
@@ -49,6 +58,9 @@ fun <T : ListModel<*>> T.onLongClick(
     )
 }
 
+/**
+ * Notifies the [block] on each long click on the view with the [viewId]
+ */
 fun <T : ListModel<*>> T.onLongClick(
     viewId: Int,
     block: (model: T, view: View) -> Boolean

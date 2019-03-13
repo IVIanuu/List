@@ -35,5 +35,8 @@ class SimpleModelController(
     }
 }
 
+/**
+ * Returns a [SimpleModelController] which uses [buildModels] to build it's models
+ */
 fun modelController(buildModels: ModelController.() -> Unit): SimpleModelController =
     SimpleModelController(buildModels = buildModels)

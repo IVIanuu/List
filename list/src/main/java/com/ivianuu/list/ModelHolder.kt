@@ -19,12 +19,19 @@ package com.ivianuu.list
 import android.view.View
 
 /**
- * @author Manuel Wrage (IVIanuu)
+ * View holder for [ListModel]s
  */
 abstract class ModelHolder {
 
+    /**
+     * The view of this holder
+     */
     lateinit var view: View
 
+    /**
+     * Will be called when the view was created
+     * This function can be used to bind click listeners etc.
+     */
     protected open fun onBindView(view: View) {
     }
 

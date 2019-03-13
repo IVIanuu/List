@@ -28,6 +28,9 @@ private val defaultExecutor = Executors.newSingleThreadExecutor()
 
 private var _defaultDiffingExecutor: Executor = defaultExecutor
 
+/**
+ * The default executor used to diff models
+ */
 var ListPlugins.defaultDiffingExecutor: Executor
     get() = _defaultDiffingExecutor
     set(value) {
@@ -36,6 +39,9 @@ var ListPlugins.defaultDiffingExecutor: Executor
 
 private var _defaultBuildingExecutor: Executor = defaultExecutor
 
+/**
+ * The default executor used to build models
+ */
 var ListPlugins.defaultBuildingExecutor: Executor
     get() = _defaultBuildingExecutor
     set(value) {

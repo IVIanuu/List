@@ -24,47 +24,45 @@ import kotlin.reflect.KProperty
  */
 class ModelProperties internal constructor() {
 
-    private var blockMutations = false
+    private var modelAdded = false
 
+    /**
+     * All properties
+     */
     val entries: Map<String, ModelProperty<*>> get() = _entries
     private val _entries = mutableMapOf<String, ModelProperty<*>>()
 
-    private val propertyDelegates = mutableMapOf<String, ModelPropertyDelegate<*>>()
+    private val uninitializedDelegates =
+        mutableMapOf<String, ModelPropertyDelegate<*>>()
 
-    internal fun blockMutations() {
-        // force init of all delegates to have consistent equals() and hashCode() results
-        propertyDelegates.forEach { it.value.initializeValue() }
-        propertyDelegates.clear()
-
-        blockMutations = true
-    }
-
-    internal fun registerDelegate(delegate: ModelPropertyDelegate<*>) {
-        propertyDelegates[delegate.key] = delegate
-    }
-
+    /**
+     * Returns the [ModelProperty] for the [key]
+     */
     fun <T> getPropertyEntry(key: String): ModelProperty<T>? =
         _entries[key] as? ModelProperty<T>?
 
+    /**
+     * Sets the [property]
+     */
     fun <T> setProperty(
         property: ModelProperty<T>
     ) {
-        check(!blockMutations) { "cannot change properties on added models" }
+        check(!modelAdded) { "cannot change properties on added models" }
         _entries[property.key] = property
-        propertyDelegates.remove(property.key)
+        uninitializedDelegates.remove(property.key)
     }
 
-    internal fun <T> getOrSetProperty(
-        key: String,
-        defaultValue: () -> ModelProperty<T>
-    ): ModelProperty<T> {
-        var property = getPropertyEntry<T>(key)
-        if (property == null) {
-            property = defaultValue()
-            _entries[key] = property
-        }
+    internal fun modelAdded() {
+        // force init of all delegates to have consistent equals() and hashCode() results
+        uninitializedDelegates.forEach { it.value.initializeValue() }
+        uninitializedDelegates.clear()
 
-        return property
+        modelAdded = true
+    }
+
+    internal fun registerDelegate(delegate: ModelPropertyDelegate<*>) {
+        check(!modelAdded) { "cannot change properties on added models" }
+        uninitializedDelegates[delegate.key] = delegate
     }
 
     override fun equals(other: Any?): Boolean {
@@ -101,11 +99,20 @@ class ModelProperties internal constructor() {
 
 }
 
+/**
+ * Returns the property value for [key] or null
+ */
 fun <T> ModelProperties.getProperty(key: String): T? = getPropertyEntry<T>(key)?.value
 
+/**
+ * Returns the property value for [key] or throws
+ */
 fun <T> ModelProperties.requireProperty(key: String): T = getProperty<T>(key)
     ?: error("missing property for key $key")
 
+/**
+ * Sets the property
+ */
 fun <T> ModelProperties.setProperty(
     key: String,
     value: T,
@@ -114,15 +121,21 @@ fun <T> ModelProperties.setProperty(
     setProperty(ModelProperty(key, value, doHash))
 }
 
+/**
+ * Entry of [ModelProperties]
+ */
 data class ModelProperty<T>(
     val key: String,
     val value: T,
     val doHash: Boolean = true
 )
 
+/**
+ * Delegate which will be used to read and write [ModelProperties] in [ListModel]s
+ */
 class ModelPropertyDelegate<T>(
     private val model: ListModel<*>,
-    val key: String,
+    internal val key: String,
     private val doHash: Boolean = true,
     private val defaultValue: () -> T
 ) : ReadWriteProperty<ListModel<*>, T> {
@@ -150,12 +163,18 @@ class ModelPropertyDelegate<T>(
     }
 
     private fun getValueInternal(): T {
-        return model.properties.getOrSetProperty(key) {
-            ModelProperty(
+        var property = model.properties.getPropertyEntry<T>(key)
+
+        if (property == null) {
+            property = ModelProperty(
                 key,
                 defaultValue(),
                 doHash
             )
-        }.value
+
+            model.properties.setProperty(property)
+        }
+
+        return property.value
     }
 }

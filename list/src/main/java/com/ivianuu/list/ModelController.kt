@@ -23,7 +23,7 @@ import java.util.concurrent.Executor
 private val delayedModelBuildHandler = Handler()
 
 /**
- * @author Manuel Wrage (IVIanuu)
+ * Controller of a underlying [ModelAdapter]
  */
 abstract class ModelController(
     private val diffingExecutor: Executor = ListPlugins.defaultDiffingExecutor,
@@ -60,6 +60,9 @@ abstract class ModelController(
 
     private val listeners = mutableSetOf<ModelControllerListener>()
 
+    /**
+     * Requests a call to [buildModels]
+     */
     open fun requestModelBuild() {
         check(!isBuildingModels) { "cannot call requestModelBuild() inside buildModels()" }
         if (hasBuiltModelsEver) {
@@ -69,11 +72,17 @@ abstract class ModelController(
         }
     }
 
+    /**
+     * Requests a synchronous call to [buildModels]
+     */
     open fun requestImmediateModelBuild() {
         check(!isBuildingModels) { "cannot call requestImmediateModelBuild() inside buildModels()" }
         buildModelsAction()
     }
 
+    /**
+     * Enqueues a delayed call to [buildModels]
+     */
     open fun requestDelayedModelBuild(delayMs: Long): Unit = synchronized(this) {
         check(!isBuildingModels) {
             "Cannot call requestDelayedModelBuild() from inside buildModels"
@@ -91,6 +100,9 @@ abstract class ModelController(
         delayedModelBuildHandler.postDelayed(delayedModelBuildAction, delayMs)
     }
 
+    /**
+     * Cancels all pending calls to [buildModels]
+     */
     fun cancelPendingModelBuild(): Unit = synchronized(this) {
         if (requestedModelBuildType != RequestedModelBuildType.NONE) {
             requestedModelBuildType = RequestedModelBuildType.NONE
@@ -98,12 +110,21 @@ abstract class ModelController(
         }
     }
 
+    /**
+     * Builds the list of models and adds them via [add]
+     */
     protected abstract fun buildModels()
 
+    /**
+     * Adds all [models]
+     */
     protected fun add(models: Iterable<ListModel<*>>) {
         models.forEach(this::add)
     }
 
+    /**
+     * Adds all [models]
+     */
     protected fun add(vararg models: ListModel<*>) {
         models.forEach(this::add)
     }
@@ -114,9 +135,15 @@ abstract class ModelController(
         currentModels.add(model)
     }
 
+    /**
+     * Will be called when the [adapter] was attached to the [recyclerView]
+     */
     protected open fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
     }
 
+    /**
+     * Will be called when the [adapter] was detached from the [recyclerView]
+     */
     protected open fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
     }
 
@@ -135,18 +162,30 @@ abstract class ModelController(
         notifyListeners { it.onDetachedFromRecyclerView(this, recyclerView) }
     }
 
+    /**
+     * Adds the [listener] to all [ListModel]s
+     */
     fun addModelListener(listener: ListModelListener) {
         adapter.addModelListener(listener)
     }
 
+    /**
+     * Removes the previously added [listener]
+     */
     fun removeModelListener(listener: ListModelListener) {
         adapter.removeModelListener(listener)
     }
 
+    /**
+     * Adds the [listener]
+     */
     fun addListener(listener: ModelControllerListener) {
         listeners.add(listener)
     }
 
+    /**
+     * Removes the previously added [listener]
+     */
     fun removeListener(listener: ModelControllerListener) {
         listeners.remove(listener)
     }

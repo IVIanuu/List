@@ -110,14 +110,23 @@ open class ModelAdapter(
         super.setHasStableIds(hasStableIds)
     }
 
+    /**
+     * Replaces all current models with the new [models]
+     */
     fun setModels(models: List<ListModel<*>>) {
         helper.submitList(models.toList())
     }
 
+    /**
+     * Adds the [listener] to all [ListModel]s
+     */
     fun addModelListener(listener: ListModelListener) {
         _modelListeners.add(listener)
     }
 
+    /**
+     * Removes the previusly added [listener]
+     */
     fun removeModelListener(listener: ListModelListener) {
         _modelListeners.remove(listener)
     }
@@ -133,58 +142,91 @@ open class ModelAdapter(
     }
 }
 
+/**
+ * Returns the model at [index]
+ */
 fun ModelAdapter.getModelAt(index: Int): ListModel<*> = models[index]
 
+/**
+ * Returns the index of the [model]
+ */
 fun ModelAdapter.indexOfModel(model: ListModel<*>): Int = models.indexOf(model)
 
+/**
+ * Adds the [model]
+ */
 fun ModelAdapter.addModel(model: ListModel<*>) {
     val newModels = models.toMutableList()
     newModels.add(model)
     setModels(newModels)
 }
 
+/**
+ * Adds the [model] at the [index]
+ */
 fun ModelAdapter.addModel(index: Int, model: ListModel<*>) {
     val newModels = models.toMutableList()
     newModels.add(index, model)
     setModels(newModels)
 }
 
+/**
+ * Adds all [models]
+ */
 fun ModelAdapter.addModels(vararg models: ListModel<*>) {
     val newModels = models.toMutableList()
     newModels.addAll(models)
     setModels(newModels)
 }
 
+/**
+ * Adds all [models] at the [index]
+ */
 fun ModelAdapter.addModels(index: Int, vararg models: ListModel<*>) {
     val newModels = models.toMutableList()
     newModels.addAll(index, models.asList())
     setModels(newModels)
 }
 
+/**
+ * Adds all [models]
+ */
 fun ModelAdapter.addModels(models: Iterable<ListModel<*>>) {
     val newModels = models.toMutableList()
     newModels.addAll(models)
     setModels(newModels)
 }
 
+/**
+ * Adds all [models] at the [index]
+ */
 fun ModelAdapter.addModels(index: Int, models: Iterable<ListModel<*>>) {
     val newModels = models.toMutableList()
     newModels.addAll(index, models.toList())
     setModels(newModels)
 }
 
+/**
+ * Removes the [model] if added
+ */
 fun ModelAdapter.removeModel(model: ListModel<*>) {
     val newModels = models.toMutableList()
     newModels.remove(model)
     setModels(newModels)
 }
 
+/**
+ * Moves the the model at [from] to the [to] index
+ */
 fun ModelAdapter.moveModel(from: Int, to: Int) {
     val newModels = models.toMutableList()
     Collections.swap(newModels, from, to)
     setModels(newModels)
 }
 
+/**
+ * Clears all added models
+ */
 fun ModelAdapter.clearModels() {
     setModels(emptyList())
 }

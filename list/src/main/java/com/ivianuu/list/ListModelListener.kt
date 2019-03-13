@@ -18,6 +18,9 @@ package com.ivianuu.list
 
 import android.view.View
 
+/**
+ * Listener for [ListModel]s
+ */
 interface ListModelListener {
 
     fun preCreateHolder(model: ListModel<*>) {

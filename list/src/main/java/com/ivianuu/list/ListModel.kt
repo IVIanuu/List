@@ -21,20 +21,32 @@ import android.view.View
 import android.view.ViewGroup
 
 /**
- * @author Manuel Wrage (IVIanuu)
+ * Single item in a [ModelAdapter]
  */
 abstract class ListModel<H : ModelHolder> {
 
+    /**
+     * The unique id of this model
+     */
     var id: Long = -1
         internal set(value) {
             check(!addedToController) { "cannot change the id of an added model" }
             field = value
         }
 
+    /**
+     * The view type of this model
+     */
     open val viewType: Int get() = layoutRes
 
+    /**
+     * The layout res of this model which will be in [onBuildView] if not overriden
+     */
     open val layoutRes = 0
 
+    /**
+     * All properties of this model which will be used to implement a correct [equals] and [hashCode]
+     */
     val properties = ModelProperties()
 
     private val listeners = mutableSetOf<ListModelListener>()
@@ -45,35 +57,59 @@ abstract class ListModel<H : ModelHolder> {
 
     protected abstract fun onCreateHolder(): H
 
+    /**
+     * Will be called when a view for model should be created
+     */
     protected open fun onBuildView(parent: ViewGroup): View {
         check(layoutRes != 0) { "specify a layoutRes if you don't override onBuildView" }
         return LayoutInflater.from(parent.context).inflate(layoutRes, parent, false)
     }
 
+    /**
+     * Should bind the data of this model to the [holder]
+     */
     protected open fun onBind(holder: H) {
         superCalled = true
     }
 
+    /**
+     * Should reverse everything done in [onBind]
+     */
     protected open fun onUnbind(holder: H) {
         superCalled = true
     }
 
+    /**
+     * Will be called when the view of the [holder] was attached to it's window
+     */
     protected open fun onAttach(holder: H) {
         superCalled = true
     }
 
+    /**
+     * Will be called when the view of the [holder] was detached from it's window
+     */
     protected open fun onDetach(holder: H) {
         superCalled = true
     }
 
+    /**
+     * Will be called when the view of the [holder] was couldn't be recycled
+     */
     protected open fun onFailedToRecycle(holder: H): Boolean = true
 
+    /**
+     * Registers a property
+     */
     protected fun <T> property(
         key: String,
         doHash: Boolean = true,
         defaultValue: () -> T
     ): ModelPropertyDelegate<T> = ModelPropertyDelegate(this, key, doHash, defaultValue)
 
+    /**
+     * Registers a non null property
+     */
     protected fun <T> requiredProperty(
         key: String,
         doHash: Boolean = true
@@ -81,16 +117,25 @@ abstract class ListModel<H : ModelHolder> {
         error("missing property with key $key use optionalProperty() for optional ones")
     }
 
+    /**
+     * Registers a nullable property
+     */
     protected fun <T> optionalProperty(
         key: String,
         doHash: Boolean = true
     ): ModelPropertyDelegate<T?> =
         ModelPropertyDelegate(this, key, doHash) { null }
 
+    /**
+     * Adds the [listener]
+     */
     fun addListener(listener: ListModelListener) {
         listeners.add(listener)
     }
 
+    /**
+     * Removes the previously added [listener]
+     */
     fun removeListener(listener: ListModelListener) {
         listeners.remove(listener)
     }
@@ -147,7 +192,7 @@ abstract class ListModel<H : ModelHolder> {
 
         this.controller = controller
         addedToController = true
-        properties.blockMutations()
+        properties.modelAdded()
     }
 
     private inline fun notifyListeners(block: (ListModelListener) -> Unit) {
@@ -188,12 +233,15 @@ abstract class ListModel<H : ModelHolder> {
     }
 }
 
+/** Calls trough [ModelProperties.getProperty] */
 fun <T> ListModel<*>.getProperty(key: String): T? =
     properties.getProperty(key)
 
+/** Calls trough [ModelProperties.requireProperty] */
 fun <T> ListModel<*>.requireProperty(key: String): T =
     properties.requireProperty(key)
 
+/** Calls trough [ModelProperties.setProperty] */
 fun <T> ListModel<*>.setProperty(
     key: String,
     value: T,
@@ -202,10 +250,16 @@ fun <T> ListModel<*>.setProperty(
     properties.setProperty(key, value, doHash)
 }
 
+/**
+ * Sets the hashed version of [id] as the model id
+ */
 fun ListModel<*>.id(id: Any?) {
     this.id = id?.hashCode()?.toLong() ?: 0
 }
 
+/**
+ * Adds this model to the [controller]
+ */
 fun <T : ListModel<*>> T.addTo(controller: ModelController): T {
     controller.addInternal(this)
     return this

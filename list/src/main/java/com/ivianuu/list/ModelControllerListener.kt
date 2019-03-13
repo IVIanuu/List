@@ -19,7 +19,7 @@ package com.ivianuu.list
 import androidx.recyclerview.widget.RecyclerView
 
 /**
- * @author Manuel Wrage (IVIanuu)
+ * Listener for [ModelController]s
  */
 interface ModelControllerListener {
 
