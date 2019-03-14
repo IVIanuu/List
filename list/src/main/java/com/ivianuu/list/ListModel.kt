@@ -30,7 +30,7 @@ abstract class ListModel<H : ModelHolder> {
      */
     var id: Long = -1
         internal set(value) {
-            check(!addedToController) { "cannot change the id of an added model" }
+            check(!addedToAdapter) { "cannot change the id of an added model" }
             field = value
         }
 
@@ -52,8 +52,8 @@ abstract class ListModel<H : ModelHolder> {
     private val listeners = mutableSetOf<ListModelListener>()
     private var superCalled = false
 
-    private lateinit var controller: ModelController
-    private var addedToController = false
+    private lateinit var adapter: ModelAdapter
+    private var addedToAdapter = false
 
     protected abstract fun onCreateHolder(): H
 
@@ -68,7 +68,7 @@ abstract class ListModel<H : ModelHolder> {
     /**
      * Should bind the data of this model to the [holder]
      */
-    protected open fun onBind(holder: H) {
+    protected open fun onBind(holder: H, previousModel: ListModel<*>?) {
         superCalled = true
     }
 
@@ -154,10 +154,10 @@ abstract class ListModel<H : ModelHolder> {
         return view
     }
 
-    internal fun bind(holder: H) {
-        notifyListeners { it.preBind(this, holder) }
-        requireSuperCalled { onBind(holder) }
-        notifyListeners { it.postBind(this, holder) }
+    internal fun bind(holder: H, previousModel: ListModel<*>?) {
+        notifyListeners { it.preBind(this, holder, previousModel) }
+        requireSuperCalled { onBind(holder, previousModel) }
+        notifyListeners { it.postBind(this, holder, previousModel) }
     }
 
     internal fun unbind(holder: H) {
@@ -184,19 +184,19 @@ abstract class ListModel<H : ModelHolder> {
         return result
     }
 
-    internal fun addedToController(controller: ModelController) {
-        check(!addedToController) {
-            "already added to a controller ${this.controller} cannot add to $controller"
+    internal fun addedToAdapter(adapter: ModelAdapter) {
+        check(!addedToAdapter) {
+            "already added to another adapter ${this.adapter} cannot add to $adapter"
         }
         check(id != 0L) { "id must be set" }
 
-        this.controller = controller
-        addedToController = true
+        this.adapter = adapter
+        addedToAdapter = true
         properties.modelAdded()
     }
 
     private inline fun notifyListeners(block: (ListModelListener) -> Unit) {
-        (controller.adapter.modelListeners + listeners.toList()).forEach(block)
+        (adapter.modelListeners + listeners.toList()).forEach(block)
     }
 
     private inline fun requireSuperCalled(block: () -> Unit) {

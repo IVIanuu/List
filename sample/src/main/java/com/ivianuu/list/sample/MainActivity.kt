@@ -133,8 +133,8 @@ class MainActivity : AppCompatActivity() {
 @Model class ButtonModel : LayoutContainerModel() {
     var buttonText by requiredProperty<String>("buttonText")
     override val layoutRes = R.layout.item_button
-    override fun onBind(holder: LayoutContainerHolder) {
-        super.onBind(holder)
+    override fun onBind(holder: LayoutContainerHolder, previousModel: ListModel<*>?) {
+        super.onBind(holder, previousModel)
         holder.button.text = buttonText
     }
 }
@@ -142,8 +142,8 @@ class MainActivity : AppCompatActivity() {
 @Model class SimpleModel : LayoutContainerModel() {
     var text by requiredProperty<String>("text")
     override val layoutRes = R.layout.item_simple
-    override fun onBind(holder: LayoutContainerHolder) {
-        super.onBind(holder)
+    override fun onBind(holder: LayoutContainerHolder, previousModel: ListModel<*>?) {
+        super.onBind(holder, previousModel)
         holder.title.text = text
     }
 }

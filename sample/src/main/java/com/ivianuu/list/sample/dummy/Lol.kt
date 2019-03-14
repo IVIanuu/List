@@ -37,7 +37,6 @@ import com.ivianuu.list.sample.R
     private val lambda: (String, Int) -> Unit
 ) : MyMiddleModel() {
     var tja by optionalProperty<MainActivity>("tja")
-
     val hehe by property("lol") { 9 }
 }
 

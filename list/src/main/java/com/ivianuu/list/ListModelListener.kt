@@ -35,10 +35,10 @@ interface ListModelListener {
     fun postCreateView(model: ListModel<*>, view: View) {
     }
 
-    fun preBind(model: ListModel<*>, holder: ModelHolder) {
+    fun preBind(model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) {
     }
 
-    fun postBind(model: ListModel<*>, holder: ModelHolder) {
+    fun postBind(model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) {
     }
 
     fun preUnbind(model: ListModel<*>, holder: ModelHolder) {
@@ -76,10 +76,10 @@ fun ListModel<*>.doOnPreCreateView(block: (model: ListModel<*>) -> Unit): ListMo
 fun ListModel<*>.doOnPostCreateView(block: (model: ListModel<*>, view: View) -> Unit): ListModelListener =
     addListener(postCreateView = block)
 
-fun ListModel<*>.doOnPreBind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): ListModelListener =
+fun ListModel<*>.doOnPreBind(block: (model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) -> Unit): ListModelListener =
     addListener(preBind = block)
 
-fun ListModel<*>.doOnPostBind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): ListModelListener =
+fun ListModel<*>.doOnPostBind(block: (model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) -> Unit): ListModelListener =
     addListener(postBind = block)
 
 fun ListModel<*>.doOnPreUnbind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): ListModelListener =
@@ -108,8 +108,8 @@ fun ListModel<*>.addListener(
     postCreateHolder: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     preCreateView: ((model: ListModel<*>) -> Unit)? = null,
     postCreateView: ((model: ListModel<*>, view: View) -> Unit)? = null,
-    preBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
-    postBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
+    preBind: ((model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) -> Unit)? = null,
+    postBind: ((model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) -> Unit)? = null,
     preUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     postUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     preAttach: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
@@ -132,8 +132,8 @@ fun ModelController.addModelListener(
     postCreateHolder: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     preCreateView: ((model: ListModel<*>) -> Unit)? = null,
     postCreateView: ((model: ListModel<*>, view: View) -> Unit)? = null,
-    preBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
-    postBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
+    preBind: ((model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) -> Unit)? = null,
+    postBind: ((model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) -> Unit)? = null,
     preUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     postUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     preAttach: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
@@ -156,8 +156,8 @@ fun ListModelListener(
     postCreateHolder: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     preCreateView: ((model: ListModel<*>) -> Unit)? = null,
     postCreateView: ((model: ListModel<*>, view: View) -> Unit)? = null,
-    preBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
-    postBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
+    preBind: ((model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) -> Unit)? = null,
+    postBind: ((model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) -> Unit)? = null,
     preUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     postUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     preAttach: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
@@ -180,8 +180,8 @@ class LambdaListModelListener(
     private val postCreateHolder: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     private val preCreateView: ((model: ListModel<*>) -> Unit)? = null,
     private val postCreateView: ((model: ListModel<*>, view: View) -> Unit)? = null,
-    private val preBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
-    private val postBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
+    private val preBind: ((model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) -> Unit)? = null,
+    private val postBind: ((model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) -> Unit)? = null,
     private val preUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     private val postUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     private val preAttach: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
@@ -207,12 +207,12 @@ class LambdaListModelListener(
         postCreateView?.invoke(model, view)
     }
 
-    override fun preBind(model: ListModel<*>, holder: ModelHolder) {
-        preBind?.invoke(model, holder)
+    override fun preBind(model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) {
+        preBind?.invoke(model, holder, previousModel)
     }
 
-    override fun postBind(model: ListModel<*>, holder: ModelHolder) {
-        postBind?.invoke(model, holder)
+    override fun postBind(model: ListModel<*>, holder: ModelHolder, previousModel: ListModel<*>?) {
+        postBind?.invoke(model, holder, previousModel)
     }
 
     override fun preUnbind(model: ListModel<*>, holder: ModelHolder) {

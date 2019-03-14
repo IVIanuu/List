@@ -28,10 +28,7 @@ import java.util.concurrent.Executor
 /**
  * List adapter for [ListModel]s
  */
-open class ModelAdapter(
-    private val controller: ModelController,
-    diffingExecutor: Executor
-) : RecyclerView.Adapter<ModelViewHolder>() {
+open class ModelAdapter(diffingExecutor: Executor) : RecyclerView.Adapter<ModelViewHolder>() {
 
     private val helper = AsyncListDiffer<ListModel<*>>(
         AdapterListUpdateCallback(this),
@@ -68,7 +65,7 @@ open class ModelAdapter(
     ) {
         super.onBindViewHolder(holder, position, payloads)
         val model = models[position]
-        holder.bind(model)
+        holder.bind(model, payloads)
     }
 
     override fun onViewRecycled(holder: ModelViewHolder) {
@@ -94,16 +91,6 @@ open class ModelAdapter(
 
     override fun onFailedToRecycleView(holder: ModelViewHolder): Boolean =
         holder.requireModel().failedToRecycleView(holder.holder)
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        controller.attachedToRecyclerView(recyclerView)
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        controller.detachedFromRecyclerView(recyclerView)
-    }
 
     final override fun setHasStableIds(hasStableIds: Boolean) {
         require(hasStableIds) { "This implementation relies on stable ids" }
@@ -138,6 +125,10 @@ open class ModelAdapter(
 
             override fun areContentsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>): Boolean =
                 oldItem == newItem
+
+            override fun getChangePayload(oldItem: ListModel<*>, newItem: ListModel<*>): Any? {
+                return oldItem
+            }
         }
     }
 }

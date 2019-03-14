@@ -16,29 +16,25 @@
 
 package com.ivianuu.list
 
-import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import java.util.concurrent.Executor
 
 /**
- * View holder for [ListModel]s
+ * Controller model adapter
  */
-abstract class ModelHolder {
+class ControllerModelAdapter(
+    private val controller: ModelController,
+    diffingExecutor: Executor
+) : ModelAdapter(diffingExecutor) {
 
-    /**
-     * The view of this holder
-     */
-    lateinit var view: View
-        private set
-
-    /**
-     * Will be called when the view was created
-     * This function can be used to bind click listeners etc.
-     */
-    protected open fun onBindView(view: View) {
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        controller.attachedToRecyclerView(recyclerView)
     }
 
-    internal fun bindView(view: View) {
-        this.view = view
-        onBindView(view)
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        controller.detachedFromRecyclerView(recyclerView)
     }
 
 }

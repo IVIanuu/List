@@ -30,7 +30,7 @@ abstract class ModelController(
     private val buildingExecutor: Executor = ListPlugins.defaultBuildingExecutor
 ) {
 
-    val adapter = ModelAdapter(this, diffingExecutor)
+    val adapter = ControllerModelAdapter(this, diffingExecutor)
 
     var isBuildingModels = false
         private set
@@ -131,7 +131,6 @@ abstract class ModelController(
 
     private fun add(model: ListModel<*>) {
         checkBuildingModels()
-        model.addedToController(this)
         currentModels.add(model)
     }
 

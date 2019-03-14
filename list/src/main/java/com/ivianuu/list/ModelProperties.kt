@@ -24,13 +24,13 @@ import kotlin.reflect.KProperty
  */
 class ModelProperties internal constructor() {
 
-    private var modelAdded = false
-
     /**
      * All properties
      */
     val entries: Map<String, ModelProperty<*>> get() = _entries
     private val _entries = mutableMapOf<String, ModelProperty<*>>()
+
+    private var modelAdded = false
 
     private val uninitializedDelegates =
         mutableMapOf<String, ModelPropertyDelegate<*>>()
@@ -39,7 +39,7 @@ class ModelProperties internal constructor() {
      * Returns the [ModelProperty] for the [key]
      */
     fun <T> getPropertyEntry(key: String): ModelProperty<T>? =
-        _entries[key] as? ModelProperty<T>?
+        _entries[key] as? ModelProperty<T>
 
     /**
      * Sets the [property]
@@ -53,7 +53,7 @@ class ModelProperties internal constructor() {
     }
 
     internal fun modelAdded() {
-        // force init of all delegates to have consistent equals() and hashCode() results
+        // force init the value of all delegates to have consistent equals() and hashCode() results
         uninitializedDelegates.values.toList()
             .forEach(ModelPropertyDelegate<*>::initializeValue)
         uninitializedDelegates.clear()
@@ -70,6 +70,7 @@ class ModelProperties internal constructor() {
         if (this === other) return true
         if (other !is ModelProperties) return false
 
+        // get all hashable properties and compare them
         val entries = _entries
             .filterValues(ModelProperty<*>::doHash)
             .map(Map.Entry<String, ModelProperty<*>>::value)
@@ -84,6 +85,7 @@ class ModelProperties internal constructor() {
     }
 
     override fun hashCode(): Int {
+        // filter out hashable properties
         val entries = _entries
             .filterValues(ModelProperty<*>::doHash)
             .map(Map.Entry<String, ModelProperty<*>>::value)
@@ -145,22 +147,16 @@ class ModelPropertyDelegate<T>(
         model.properties.registerDelegate(this)
     }
 
-    internal fun initializeValue() {
-        getValueInternal()
-    }
-
     override fun getValue(thisRef: ListModel<*>, property: KProperty<*>): T {
         return getValueInternal()
     }
 
     override fun setValue(thisRef: ListModel<*>, property: KProperty<*>, value: T) {
-        model.properties.setProperty(
-            ModelProperty(
-                key,
-                value,
-                doHash
-            )
-        )
+        model.properties.setProperty(key, value, doHash)
+    }
+
+    internal fun initializeValue() {
+        getValueInternal()
     }
 
     private fun getValueInternal(): T {
