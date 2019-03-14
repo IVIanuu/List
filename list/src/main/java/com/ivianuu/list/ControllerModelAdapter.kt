@@ -22,7 +22,7 @@ import java.util.concurrent.Executor
 /**
  * Controller model adapter
  */
-class ControllerModelAdapter(
+open class ControllerModelAdapter(
     private val controller: ModelController,
     diffingExecutor: Executor
 ) : ModelAdapter(diffingExecutor) {
