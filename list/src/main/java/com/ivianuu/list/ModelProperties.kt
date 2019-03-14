@@ -96,7 +96,8 @@ class ModelProperties internal constructor() {
     override fun toString(): String {
         val entries = _entries
             .map(Map.Entry<String, ModelProperty<*>>::value)
-            .map(ModelProperty<*>::value)
+            .associateBy(ModelProperty<*>::key)
+            .mapValues { it.value.value }
         return entries.toString()
     }
 
