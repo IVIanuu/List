@@ -101,7 +101,9 @@ open class ModelAdapter(diffingExecutor: Executor) : RecyclerView.Adapter<ModelV
      * Replaces all current models with the new [models]
      */
     fun setModels(models: List<ListModel<*>>) {
-        helper.submitList(models.toList())
+        val models = models.toList()
+        models.forEach { it.addedToAdapter(this) }
+        helper.submitList(models)
     }
 
     /**
