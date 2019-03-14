@@ -18,12 +18,15 @@ import com.ivianuu.list.moveModel
 import com.ivianuu.list.removeModel
 import kotlinx.android.synthetic.main.activity_main.list
 import kotlinx.android.synthetic.main.item_button.button
+import kotlinx.android.synthetic.main.item_count.count
 import kotlinx.android.synthetic.main.item_simple.title
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private val models = mutableListOf<String>()
+
+    private var countModelCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +42,19 @@ class MainActivity : AppCompatActivity() {
                 buttonText("Shuffle")
                 onClick(R.id.button) { _, _ ->
                     models.shuffle()
+                    requestModelBuild()
+                }
+            }
+
+            count {
+                id("count")
+                count(countModelCount)
+                onClick(R.id.inc_button) { _, _ ->
+                    countModelCount++
+                    requestModelBuild()
+                }
+                onClick(R.id.dec_button) { _, _ ->
+                    countModelCount--
                     requestModelBuild()
                 }
             }
@@ -136,6 +152,16 @@ class MainActivity : AppCompatActivity() {
     override fun onBind(holder: LayoutContainerHolder, previousModel: ListModel<*>?) {
         super.onBind(holder, previousModel)
         holder.button.text = buttonText
+    }
+}
+
+@Model class CountModel : LayoutContainerModel() {
+    var count by requiredProperty<Int>("count")
+    override val layoutRes = R.layout.item_count
+    override fun onBind(holder: LayoutContainerHolder, previousModel: ListModel<*>?) {
+        super.onBind(holder, previousModel)
+        holder.count.text = "Count is $count"
+        println("bind count: $count previous: $previousModel")
     }
 }
 
