@@ -149,8 +149,8 @@ class MainActivity : AppCompatActivity() {
 @Model class ButtonModel : LayoutContainerModel() {
     var buttonText by requiredProperty<String>("buttonText")
     override val layoutRes = R.layout.item_button
-    override fun onBind(holder: LayoutContainerHolder, previousModel: ListModel<*>?) {
-        super.onBind(holder, previousModel)
+    override fun onBind(holder: LayoutContainerHolder) {
+        super.onBind(holder)
         holder.button.text = buttonText
     }
 }
@@ -158,18 +158,17 @@ class MainActivity : AppCompatActivity() {
 @Model class CountModel : LayoutContainerModel() {
     var count by requiredProperty<Int>("count")
     override val layoutRes = R.layout.item_count
-    override fun onBind(holder: LayoutContainerHolder, previousModel: ListModel<*>?) {
-        super.onBind(holder, previousModel)
+    override fun onBind(holder: LayoutContainerHolder) {
+        super.onBind(holder)
         holder.count.text = "Count is $count"
-        println("bind count: $count previous: $previousModel")
     }
 }
 
 @Model class SimpleModel : LayoutContainerModel() {
     var text by requiredProperty<String>("text")
     override val layoutRes = R.layout.item_simple
-    override fun onBind(holder: LayoutContainerHolder, previousModel: ListModel<*>?) {
-        super.onBind(holder, previousModel)
+    override fun onBind(holder: LayoutContainerHolder) {
+        super.onBind(holder)
         holder.title.text = text
     }
 }

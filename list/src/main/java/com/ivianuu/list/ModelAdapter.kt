@@ -65,7 +65,7 @@ open class ModelAdapter(diffingExecutor: Executor) : RecyclerView.Adapter<ModelV
     ) {
         super.onBindViewHolder(holder, position, payloads)
         val model = models[position]
-        holder.bind(model, payloads)
+        holder.bind(model)
     }
 
     override fun onViewRecycled(holder: ModelViewHolder) {
@@ -127,10 +127,6 @@ open class ModelAdapter(diffingExecutor: Executor) : RecyclerView.Adapter<ModelV
 
             override fun areContentsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>): Boolean =
                 oldItem == newItem
-
-            override fun getChangePayload(oldItem: ListModel<*>, newItem: ListModel<*>): Any? {
-                return oldItem
-            }
         }
     }
 }

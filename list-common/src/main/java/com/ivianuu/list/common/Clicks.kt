@@ -29,7 +29,7 @@ fun <T : ListModel<*>> T.onClick(
 ) {
     val listener = View.OnClickListener { block(this, it) }
     addListener(
-        postBind = { _, holder, _ -> viewProvider(holder.view).setOnClickListener(listener) },
+        postBind = { _, holder -> viewProvider(holder.view).setOnClickListener(listener) },
         preUnbind = { _, holder -> viewProvider(holder.view).setOnClickListener(null) }
     )
 }
@@ -53,7 +53,7 @@ fun <T : ListModel<*>> T.onLongClick(
 ) {
     val listener = View.OnLongClickListener { block(this, it) }
     addListener(
-        postBind = { _, holder, _ -> viewProvider(holder.view).setOnLongClickListener(listener) },
+        postBind = { _, holder -> viewProvider(holder.view).setOnLongClickListener(listener) },
         preUnbind = { _, holder -> viewProvider(holder.view).setOnLongClickListener(null) }
     )
 }

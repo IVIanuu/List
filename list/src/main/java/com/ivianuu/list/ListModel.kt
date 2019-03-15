@@ -68,7 +68,7 @@ abstract class ListModel<H : ModelHolder> {
     /**
      * Should bind the data of this model to the [holder]
      */
-    protected open fun onBind(holder: H, previousModel: ListModel<*>?) {
+    protected open fun onBind(holder: H) {
         superCalled = true
     }
 
@@ -154,10 +154,10 @@ abstract class ListModel<H : ModelHolder> {
         return view
     }
 
-    internal fun bind(holder: H, previousModel: ListModel<*>?) {
-        notifyListeners { it.preBind(this, holder, previousModel) }
-        requireSuperCalled { onBind(holder, previousModel) }
-        notifyListeners { it.postBind(this, holder, previousModel) }
+    internal fun bind(holder: H) {
+        notifyListeners { it.preBind(this, holder) }
+        requireSuperCalled { onBind(holder) }
+        notifyListeners { it.postBind(this, holder) }
     }
 
     internal fun unbind(holder: H) {

@@ -18,8 +18,6 @@ package com.ivianuu.list
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.ivianuu.stdlibx.firstNotNullResultOrNull
-import com.ivianuu.stdlibx.safeAs
 
 /**
  * View holder used in [ModelAdapter]s
@@ -39,7 +37,7 @@ class ModelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private set
     private var holderCreated = false
 
-    internal fun bind(model: ListModel<*>, payloads: List<Any?>) {
+    internal fun bind(model: ListModel<*>) {
         this.model = model as ListModel<ModelHolder>
 
         if (!holderCreated) {
@@ -48,7 +46,7 @@ class ModelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             holder.bindView(itemView)
         }
 
-        model.bind(holder, payloads.firstNotNullResultOrNull { it.safeAs<ListModel<*>>() })
+        model.bind(holder)
     }
 
     internal fun unbind() {
