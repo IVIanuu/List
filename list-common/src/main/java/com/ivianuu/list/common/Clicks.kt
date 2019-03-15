@@ -18,52 +18,53 @@ package com.ivianuu.list.common
 
 import android.view.View
 import com.ivianuu.list.ListModel
+import com.ivianuu.list.ModelHolder
 import com.ivianuu.list.addListener
 
 /**
  * Notifies the [block] on each click to the result of [viewProvider]
  */
-fun <T : ListModel<*>> T.onClick(
-    viewProvider: (View) -> View = { it },
+fun <T : ListModel<H>, H : ModelHolder> T.onClick(
+    viewProvider: (H) -> View = { it.view },
     block: (model: T, view: View) -> Unit
 ) {
     val listener = View.OnClickListener { block(this, it) }
     addListener(
-        postBind = { _, holder -> viewProvider(holder.view).setOnClickListener(listener) },
-        preUnbind = { _, holder -> viewProvider(holder.view).setOnClickListener(null) }
+        postBind = { _, holder -> viewProvider(holder as H).setOnClickListener(listener) },
+        preUnbind = { _, holder -> viewProvider(holder as H).setOnClickListener(null) }
     )
 }
 
 /**
  * Notifies the [block] on each click on the view with the [viewId]
  */
-fun <T : ListModel<*>> T.onClick(
+fun <T : ListModel<H>, H : ModelHolder> T.onClick(
     viewId: Int,
     block: (model: T, view: View) -> Unit
 ) {
-    onClick({ it.findViewById(viewId) }, block)
+    onClick({ it.view.findViewById(viewId) }, block)
 }
 
 /**
  * Notifies the [block] on each long click to the result of [viewProvider]
  */
-fun <T : ListModel<*>> T.onLongClick(
-    viewProvider: (View) -> View = { it },
+fun <T : ListModel<H>, H : ModelHolder> T.onLongClick(
+    viewProvider: (H) -> View = { it.view },
     block: (model: T, view: View) -> Boolean
 ) {
     val listener = View.OnLongClickListener { block(this, it) }
     addListener(
-        postBind = { _, holder -> viewProvider(holder.view).setOnLongClickListener(listener) },
-        preUnbind = { _, holder -> viewProvider(holder.view).setOnLongClickListener(null) }
+        postBind = { _, holder -> viewProvider(holder as H).setOnLongClickListener(listener) },
+        preUnbind = { _, holder -> viewProvider(holder as H).setOnLongClickListener(null) }
     )
 }
 
 /**
  * Notifies the [block] on each long click on the view with the [viewId]
  */
-fun <T : ListModel<*>> T.onLongClick(
+fun <T : ListModel<H>, H : ModelHolder> T.onLongClick(
     viewId: Int,
     block: (model: T, view: View) -> Boolean
 ) {
-    onLongClick({ it.findViewById(viewId) }, block)
+    onLongClick({ it.view.findViewById(viewId) }, block)
 }

@@ -85,7 +85,7 @@ class ModelProperties internal constructor() {
     }
 
     override fun hashCode(): Int {
-        // filter out hashable properties
+        // filter out non hashable properties
         val entries = _entries
             .filterValues(ModelProperty<*>::doHash)
             .map(Map.Entry<String, ModelProperty<*>>::value)

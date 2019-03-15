@@ -56,14 +56,6 @@ open class ModelAdapter(diffingExecutor: Executor) : RecyclerView.Adapter<ModelV
     }
 
     override fun onBindViewHolder(holder: ModelViewHolder, position: Int) {
-    }
-
-    override fun onBindViewHolder(
-        holder: ModelViewHolder,
-        position: Int,
-        payloads: MutableList<Any>
-    ) {
-        super.onBindViewHolder(holder, position, payloads)
         val model = models[position]
         holder.bind(model)
     }
