@@ -17,7 +17,6 @@
 package com.ivianuu.list
 
 import android.os.Handler
-import androidx.recyclerview.widget.RecyclerView
 import java.util.concurrent.Executor
 
 private val delayedModelBuildHandler = Handler()
@@ -30,7 +29,7 @@ abstract class ModelController(
     private val buildingExecutor: Executor = ListPlugins.defaultBuildingExecutor
 ) {
 
-    val adapter = ControllerModelAdapter(this, diffingExecutor)
+    open val adapter = ModelAdapter(diffingExecutor)
 
     var isBuildingModels = false
         private set
@@ -57,8 +56,6 @@ abstract class ModelController(
     }
 
     private var requestedModelBuildType = RequestedModelBuildType.NONE
-
-    private val listeners = mutableSetOf<ModelControllerListener>()
 
     /**
      * Requests a call to [buildModels]
@@ -134,31 +131,9 @@ abstract class ModelController(
         currentModels.add(model)
     }
 
-    /**
-     * Will be called when the [adapter] was attached to the [recyclerView]
-     */
-    protected open fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-    }
-
-    /**
-     * Will be called when the [adapter] was detached from the [recyclerView]
-     */
-    protected open fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-    }
-
     @PublishedApi
     internal fun addInternal(model: ListModel<*>) {
         add(model)
-    }
-
-    internal fun attachedToRecyclerView(recyclerView: RecyclerView) {
-        onAttachedToRecyclerView(recyclerView)
-        notifyListeners { it.onAttachedToRecyclerView(this, recyclerView) }
-    }
-
-    internal fun detachedFromRecyclerView(recyclerView: RecyclerView) {
-        onDetachedFromRecyclerView(recyclerView)
-        notifyListeners { it.onDetachedFromRecyclerView(this, recyclerView) }
     }
 
     /**
@@ -175,26 +150,8 @@ abstract class ModelController(
         adapter.removeModelListener(listener)
     }
 
-    /**
-     * Adds the [listener]
-     */
-    fun addListener(listener: ModelControllerListener) {
-        listeners.add(listener)
-    }
-
-    /**
-     * Removes the previously added [listener]
-     */
-    fun removeListener(listener: ModelControllerListener) {
-        listeners.remove(listener)
-    }
-
     private fun checkBuildingModels() {
         check(isBuildingModels) { "cannot add models outside of buildModels()" }
-    }
-
-    private inline fun notifyListeners(block: (ModelControllerListener) -> Unit) {
-        listeners.toList().forEach(block)
     }
 
     private enum class RequestedModelBuildType {

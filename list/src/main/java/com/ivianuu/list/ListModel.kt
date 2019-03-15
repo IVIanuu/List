@@ -40,7 +40,7 @@ abstract class ListModel<H : ModelHolder> {
     open val viewType: Int get() = layoutRes
 
     /**
-     * The layout res of this model which will be in [onBuildView] if not overriden
+     * The layout res of this model which will be in [buildView] if not overriden
      */
     open val layoutRes = 0
 
@@ -55,48 +55,29 @@ abstract class ListModel<H : ModelHolder> {
     private lateinit var adapter: ModelAdapter
     private var addedToAdapter = false
 
-    protected abstract fun onCreateHolder(): H
+    protected abstract fun createHolder(): H
 
     /**
      * Will be called when a view for model should be created
      */
-    protected open fun onBuildView(parent: ViewGroup): View {
-        check(layoutRes != 0) { "specify a layoutRes if you don't override onBuildView" }
+    protected open fun buildView(parent: ViewGroup): View {
+        check(layoutRes != 0) { "specify a layoutRes if you don't override buildView" }
         return LayoutInflater.from(parent.context).inflate(layoutRes, parent, false)
     }
 
     /**
-     * Should bind the data of this model to the [holder]
+     * Should bindHolder the data of this model to the [holder]
      */
-    protected open fun onBind(holder: H) {
+    protected open fun bind(holder: H) {
         superCalled = true
     }
 
     /**
-     * Should reverse everything done in [onBind]
+     * Should reverse everything done in [bind]
      */
-    protected open fun onUnbind(holder: H) {
+    protected open fun unbind(holder: H) {
         superCalled = true
     }
-
-    /**
-     * Will be called when the view of the [holder] was attached to it's window
-     */
-    protected open fun onAttach(holder: H) {
-        superCalled = true
-    }
-
-    /**
-     * Will be called when the view of the [holder] was detached from it's window
-     */
-    protected open fun onDetach(holder: H) {
-        superCalled = true
-    }
-
-    /**
-     * Will be called when the view of the [holder] was couldn't be recycled
-     */
-    protected open fun onFailedToRecycle(holder: H): Boolean = true
 
     /**
      * Registers a property
@@ -140,48 +121,28 @@ abstract class ListModel<H : ModelHolder> {
         listeners.remove(listener)
     }
 
-    internal fun createHolder(): H {
-        notifyListeners { it.preCreateHolder(this) }
-        val holder = onCreateHolder()
-        notifyListeners { it.postCreateHolder(this, holder) }
+    internal fun newHolder(): H {
+        val holder = createHolder()
+        notifyListeners { it.onCreateHolder(this, holder) }
         return holder
     }
 
-    internal fun buildView(parent: ViewGroup): View {
-        notifyListeners { it.preCreateView(this) }
-        val view = onBuildView(parent)
-        notifyListeners { it.postCreateView(this, view) }
+    internal fun createView(parent: ViewGroup): View {
+        val view = buildView(parent)
+        notifyListeners { it.onBuildView(this, view) }
         return view
     }
 
-    internal fun bind(holder: H) {
+    internal fun bindHolder(holder: H) {
         notifyListeners { it.preBind(this, holder) }
-        requireSuperCalled { onBind(holder) }
+        requireSuperCalled { bind(holder) }
         notifyListeners { it.postBind(this, holder) }
     }
 
-    internal fun unbind(holder: H) {
+    internal fun unbindView(holder: H) {
         notifyListeners { it.preUnbind(this, holder) }
-        requireSuperCalled { onUnbind(holder) }
+        requireSuperCalled { unbind(holder) }
         notifyListeners { it.postUnbind(this, holder) }
-    }
-
-    internal fun attach(holder: H) {
-        notifyListeners { it.preAttach(this, holder) }
-        requireSuperCalled { onAttach(holder) }
-        notifyListeners { it.postAttach(this, holder) }
-    }
-
-    internal fun detach(holder: H) {
-        notifyListeners { it.preDetach(this, holder) }
-        requireSuperCalled { onDetach(holder) }
-        notifyListeners { it.postDetach(this, holder) }
-    }
-
-    internal fun failedToRecycleView(holder: H): Boolean {
-        val result = onFailedToRecycle(holder)
-        notifyListeners { it.onFailedToRecycleView(this, holder) }
-        return result
     }
 
     internal fun addedToAdapter(adapter: ModelAdapter) {
@@ -211,7 +172,6 @@ abstract class ListModel<H : ModelHolder> {
 
         if (id != other.id) return false
         if (viewType != other.viewType) return false
-
         if (properties != other.properties) return false
 
         return true

@@ -17,9 +17,8 @@
 package com.ivianuu.list.sample.dummy
 
 import android.content.Context
-import com.ivianuu.list.ListModel
 import com.ivianuu.list.annotations.Model
-import com.ivianuu.list.common.LayoutContainerHolder
+import com.ivianuu.list.common.LayoutContainerModel
 import com.ivianuu.list.sample.MainActivity
 import com.ivianuu.list.sample.R
 
@@ -50,8 +49,7 @@ import com.ivianuu.list.sample.R
 }
 
 @Model
-abstract class MyBaseModel : ListModel<LayoutContainerHolder>() {
+abstract class MyBaseModel : LayoutContainerModel() {
     var accessToken by requiredProperty<String>("accessToken")
     var onMenuClick by optionalProperty<(Int, String) -> Unit>("onMenuClick")
-    override fun onCreateHolder(): LayoutContainerHolder = LayoutContainerHolder()
 }

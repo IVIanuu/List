@@ -51,7 +51,7 @@ open class ModelAdapter(diffingExecutor: Executor) : RecyclerView.Adapter<ModelV
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModelViewHolder {
         val model = models.first { it.viewType == viewType }
-        val view = model.buildView(parent)
+        val view = model.createView(parent)
         return ModelViewHolder(view)
     }
 
@@ -70,19 +70,6 @@ open class ModelAdapter(diffingExecutor: Executor) : RecyclerView.Adapter<ModelV
     override fun getItemCount(): Int = models.size
 
     override fun getItemViewType(position: Int): Int = models[position].viewType
-
-    override fun onViewAttachedToWindow(holder: ModelViewHolder) {
-        super.onViewAttachedToWindow(holder)
-        holder.requireModel().attach(holder.holder)
-    }
-
-    override fun onViewDetachedFromWindow(holder: ModelViewHolder) {
-        super.onViewDetachedFromWindow(holder)
-        holder.requireModel().detach(holder.holder)
-    }
-
-    override fun onFailedToRecycleView(holder: ModelViewHolder): Boolean =
-        holder.requireModel().failedToRecycleView(holder.holder)
 
     final override fun setHasStableIds(hasStableIds: Boolean) {
         require(hasStableIds) { "This implementation relies on stable ids" }

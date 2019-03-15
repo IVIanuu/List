@@ -31,7 +31,7 @@ abstract class ModelHolder {
 
     /**
      * Will be called when the view was created
-     * This function can be used to bind click listeners etc.
+     * This function can be used to bindHolder click listeners etc.
      */
     protected open fun onBindView(view: View) {
     }

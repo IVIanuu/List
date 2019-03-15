@@ -42,15 +42,15 @@ class ModelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         if (!holderCreated) {
             holderCreated = true
-            holder = model.createHolder()
+            holder = model.newHolder()
             holder.bindView(itemView)
         }
 
-        model.bind(holder)
+        model.bindHolder(holder)
     }
 
     internal fun unbind() {
-        model?.unbind(holder)
+        model?.unbindView(holder)
         model = null
     }
 

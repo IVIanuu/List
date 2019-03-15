@@ -33,5 +33,5 @@ open class LayoutContainerHolder : ModelHolder(), LayoutContainer {
  * A [ListModel] which uses [LayoutContainerHolder]s
  */
 abstract class LayoutContainerModel : ListModel<LayoutContainerHolder>() {
-    override fun onCreateHolder(): LayoutContainerHolder = LayoutContainerHolder()
+    override fun createHolder(): LayoutContainerHolder = LayoutContainerHolder()
 }
