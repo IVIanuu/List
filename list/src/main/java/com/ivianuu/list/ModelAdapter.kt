@@ -28,7 +28,9 @@ import java.util.concurrent.Executor
 /**
  * List adapter for [ListModel]s
  */
-open class ModelAdapter(diffingExecutor: Executor) : RecyclerView.Adapter<ModelViewHolder>() {
+open class ModelAdapter(
+    diffingExecutor: Executor = ListPlugins.defaultDiffingExecutor
+) : RecyclerView.Adapter<ModelViewHolder>() {
 
     private val helper = AsyncListDiffer<ListModel<*>>(
         AdapterListUpdateCallback(this),
