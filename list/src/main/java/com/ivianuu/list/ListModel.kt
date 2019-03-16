@@ -187,7 +187,7 @@ abstract class ListModel<H : ModelHolder> {
     override fun toString(): String {
         return "${javaClass.simpleName}(" +
                 "id=$id," +
-                "viewType=$viewType" +
+                "viewType=$viewType," +
                 "properties=$properties" +
                 ")"
     }
