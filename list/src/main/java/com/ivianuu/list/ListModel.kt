@@ -146,10 +146,13 @@ abstract class ListModel<H : ModelHolder> {
     }
 
     internal fun addedToAdapter(adapter: ModelAdapter) {
+        if (addedToAdapter && this.adapter == adapter) return
+
+        check(id != 0L) { "id must be set" }
+
         check(!addedToAdapter) {
             "already added to another adapter ${this.adapter} cannot add to $adapter"
         }
-        check(id != 0L) { "id must be set" }
 
         this.adapter = adapter
         addedToAdapter = true

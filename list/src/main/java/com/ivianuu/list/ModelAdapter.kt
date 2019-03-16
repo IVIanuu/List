@@ -83,6 +83,15 @@ open class ModelAdapter(
      */
     fun setModels(models: List<ListModel<*>>) {
         val models = models.toList()
+
+        // check for duplicated ids
+        models
+            .groupBy(ListModel<*>::id)
+            .filterValues { it.size > 1 }
+            .forEach {
+                error("Duplicated id ${it.value}")
+            }
+
         models.forEach { it.addedToAdapter(this) }
         helper.submitList(models)
     }
