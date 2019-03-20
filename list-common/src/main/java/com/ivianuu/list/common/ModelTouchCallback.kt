@@ -25,6 +25,9 @@ import com.ivianuu.list.ModelAdapter
 import com.ivianuu.list.ModelViewHolder
 import com.ivianuu.list.moveModel
 import com.ivianuu.list.requireModel
+import kotlin.math.absoluteValue
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
@@ -181,14 +184,14 @@ abstract class ModelTouchCallback<T : ListModel<*>>(
 
         val itemView = viewHolder.itemView
 
-        val swipeProgress = if (Math.abs(dX) > Math.abs(dY)) {
+        val swipeProgress = if (dX.absoluteValue > dY.absoluteValue) {
             dX / itemView.width
         } else {
             dY / itemView.height
         }
 
         // Clamp to 1/-1 in the case of side padding where the view can be swiped extra
-        val clampedProgress = Math.max(-1f, Math.min(1f, swipeProgress))
+        val clampedProgress = max(-1f, min(1f, swipeProgress))
 
         onSwipeProgressChanged(model as T, itemView, clampedProgress, c)
     }

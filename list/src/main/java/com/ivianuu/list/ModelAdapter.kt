@@ -104,7 +104,7 @@ open class ModelAdapter(
     }
 
     /**
-     * Removes the previusly added [listener]
+     * Removes the previously added [listener]
      */
     fun removeModelListener(listener: ListModelListener) {
         _modelListeners.remove(listener)
