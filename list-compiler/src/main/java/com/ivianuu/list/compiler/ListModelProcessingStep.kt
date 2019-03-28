@@ -18,8 +18,8 @@ package com.ivianuu.list.compiler
 
 import com.google.common.collect.SetMultimap
 import com.ivianuu.list.annotations.Model
-import com.ivianuu.processingx.ProcessingStep
-import com.ivianuu.processingx.write
+import com.ivianuu.processingx.filer
+import com.ivianuu.processingx.steps.ProcessingStep
 import com.squareup.kotlinpoet.asClassName
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDelegated
@@ -28,26 +28,24 @@ import me.eugeniomarletti.kotlin.metadata.isVal
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.visibility
-import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.tools.Diagnostic
+import kotlin.reflect.KClass
 
-class ListModelProcessingStep(
-    private val processingEnv: ProcessingEnvironment
-) : ProcessingStep {
+class ListModelProcessingStep : ProcessingStep() {
 
-    override fun annotations() = setOf(Model::class.java)
+    override fun annotations() = setOf(Model::class)
 
-    override fun process(elementsByAnnotation: SetMultimap<Class<out Annotation>, Element>): Set<Element> {
-        elementsByAnnotation[Model::class.java]
+    override fun process(elementsByAnnotation: SetMultimap<KClass<out Annotation>, Element>): Set<Element> {
+        elementsByAnnotation[Model::class]
             .filterIsInstance<TypeElement>()
             .mapNotNull(this::createDescriptor)
             .map(::ListGenerator)
             .map(ListGenerator::generate)
-            .forEach { it.write(processingEnv) }
+            .forEach { it.writeTo(filer) }
 
         return emptySet()
     }

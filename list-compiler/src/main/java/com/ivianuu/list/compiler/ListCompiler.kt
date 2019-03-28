@@ -17,16 +17,12 @@
 package com.ivianuu.list.compiler
 
 import com.google.auto.service.AutoService
-import com.ivianuu.processingx.StepProcessor
+import com.ivianuu.processingx.steps.StepProcessor
 import javax.annotation.processing.Processor
 
 @AutoService(Processor::class)
 class ListCompiler : StepProcessor() {
 
-    private val listModelStep by lazy {
-        ListModelProcessingStep(processingEnv)
-    }
-
-    override fun initSteps() = listOf(listModelStep)
+    override fun initSteps() = listOf(ListModelProcessingStep())
 
 }
