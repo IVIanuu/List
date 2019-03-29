@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.ivianuu.list.ListModel
 import com.ivianuu.list.annotations.Model
 import com.ivianuu.list.common.LayoutContainerHolder
 import com.ivianuu.list.common.LayoutContainerModel
@@ -14,8 +13,6 @@ import com.ivianuu.list.common.ModelTouchHelper
 import com.ivianuu.list.common.modelController
 import com.ivianuu.list.common.onClick
 import com.ivianuu.list.id
-import com.ivianuu.list.moveModel
-import com.ivianuu.list.removeModel
 import kotlinx.android.synthetic.main.activity_main.list
 import kotlinx.android.synthetic.main.item_button.button
 import kotlinx.android.synthetic.main.item_count.count
@@ -108,36 +105,36 @@ class MainActivity : AppCompatActivity() {
 
         ModelTouchHelper.dragging(list)
             .vertical()
-            .all()
+            .target(SimpleModel::class)
             .callbacks(
-                object : ModelTouchHelper.DragCallbacks<ListModel<*>>() {
+                object : ModelTouchHelper.DragCallbacks<SimpleModel>() {
                     override fun onModelMoved(
                         fromPosition: Int,
                         toPosition: Int,
-                        modelBeingMoved: ListModel<*>,
+                        modelBeingMoved: SimpleModel,
                         itemView: View
                     ) {
                         super.onModelMoved(fromPosition, toPosition, modelBeingMoved, itemView)
-                        Collections.swap(models, fromPosition, toPosition)
-                        controller.adapter.moveModel(fromPosition, toPosition)
+                        Collections.swap(models, fromPosition - 3, toPosition - 3)
+                        controller.requestDelayedModelBuild(500)
                     }
                 }
             )
 
         ModelTouchHelper.swiping(list)
             .leftAndRight()
-            .all()
+            .target(SimpleModel::class)
             .callbacks(
-                object : ModelTouchHelper.SwipeCallbacks<ListModel<*>>() {
+                object : ModelTouchHelper.SwipeCallbacks<SimpleModel>() {
                     override fun onSwipeCompleted(
-                        model: ListModel<*>,
+                        model: SimpleModel,
                         itemView: View,
                         position: Int,
                         direction: Int
                     ) {
                         super.onSwipeCompleted(model, itemView, position, direction)
                         models.removeAt(position)
-                        controller.adapter.removeModel(model)
+                        controller.requestModelBuild()
                     }
                 }
             )
