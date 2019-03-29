@@ -47,12 +47,17 @@ open class ModelAdapter(
     internal val modelListeners get() = _modelListeners
     private val _modelListeners = mutableSetOf<ListModelListener>()
 
+    private var lastModelForViewTypeLookup: ListModel<*>? = null
+
     init {
         setHasStableIds(true)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModelViewHolder {
-        val model = currentModels.first { it.viewType == viewType }
+        var model = lastModelForViewTypeLookup
+        if (model == null || model.viewType != viewType) {
+            model = currentModels.first { it.viewType == viewType }
+        }
         val view = model.createView(parent)
         return ModelViewHolder(view)
     }
@@ -71,7 +76,11 @@ open class ModelAdapter(
 
     override fun getItemCount(): Int = currentModels.size
 
-    override fun getItemViewType(position: Int): Int = currentModels[position].viewType
+    override fun getItemViewType(position: Int): Int {
+        val model = currentModels[position]
+        lastModelForViewTypeLookup = model
+        return model.viewType
+    }
 
     final override fun setHasStableIds(hasStableIds: Boolean) {
         require(hasStableIds) { "This implementation relies on stable ids" }
