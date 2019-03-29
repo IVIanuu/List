@@ -33,8 +33,11 @@ open class ModelAdapter(
         diffingExecutor,
         DIFF_CALLBACK
     ) {
+        resultListener?.invoke(it)
         it.dispatchTo(this)
     }
+
+    var resultListener: ((DiffResult) -> Unit)? = null
 
     /**
      * All current models
