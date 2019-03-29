@@ -17,9 +17,6 @@
 package com.ivianuu.list
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AdapterListUpdateCallback
-import androidx.recyclerview.widget.AsyncDifferConfig
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
@@ -32,17 +29,17 @@ open class ModelAdapter(
     diffingExecutor: Executor = ListPlugins.defaultDiffingExecutor
 ) : RecyclerView.Adapter<ModelViewHolder>() {
 
-    private val helper = AsyncListDiffer<ListModel<*>>(
-        AdapterListUpdateCallback(this),
-        AsyncDifferConfig.Builder(DIFF_CALLBACK)
-            .setBackgroundThreadExecutor(diffingExecutor)
-            .build()
-    )
+    private val differ = AsyncModelDiffer(
+        diffingExecutor,
+        DIFF_CALLBACK
+    ) {
+        it.dispatchTo(this)
+    }
 
     /**
      * All current models
      */
-    val models: List<ListModel<*>> get() = helper.currentList
+    val currentModels: List<ListModel<*>> get() = differ.currentList
 
     internal val modelListeners get() = _modelListeners
     private val _modelListeners = mutableSetOf<ListModelListener>()
@@ -52,13 +49,13 @@ open class ModelAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModelViewHolder {
-        val model = models.first { it.viewType == viewType }
+        val model = currentModels.first { it.viewType == viewType }
         val view = model.createView(parent)
         return ModelViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ModelViewHolder, position: Int) {
-        val model = models[position]
+        val model = currentModels[position]
         holder.bind(model)
     }
 
@@ -67,11 +64,11 @@ open class ModelAdapter(
         holder.unbind()
     }
 
-    override fun getItemId(position: Int): Long = models[position].id
+    override fun getItemId(position: Int): Long = currentModels[position].id
 
-    override fun getItemCount(): Int = models.size
+    override fun getItemCount(): Int = currentModels.size
 
-    override fun getItemViewType(position: Int): Int = models[position].viewType
+    override fun getItemViewType(position: Int): Int = currentModels[position].viewType
 
     final override fun setHasStableIds(hasStableIds: Boolean) {
         require(hasStableIds) { "This implementation relies on stable ids" }
@@ -79,21 +76,23 @@ open class ModelAdapter(
     }
 
     /**
-     * Replaces all current models with the new [models]
+     * Replaces the current models with [models], diffs them and dispatches the changes to
+     * this adapter
      */
     fun setModels(models: List<ListModel<*>>) {
-        val models = models.toList()
-
-        // check for duplicated ids
-        models
-            .groupBy(ListModel<*>::id)
-            .filterValues { it.size > 1 }
-            .forEach {
-                error("Duplicated id ${it.value}")
-            }
-
+        models.checkDuplicates()
         models.forEach { it.addedToAdapter(this) }
-        helper.submitList(models)
+        differ.submitList(models)
+    }
+
+    /**
+     * Replaces the current models with [models] but doesn't perform any diffing
+     * And does not notify any changes to this adapter
+     */
+    fun overrideModels(models: List<ListModel<*>>) {
+        models.checkDuplicates()
+        models.forEach { it.addedToAdapter(this) }
+        differ.forceListOverride(models)
     }
 
     /**
@@ -110,6 +109,15 @@ open class ModelAdapter(
         _modelListeners.remove(listener)
     }
 
+    private fun List<ListModel<*>>.checkDuplicates() {
+        // check for duplicated ids
+        groupBy(ListModel<*>::id)
+            .filterValues { it.size > 1 }
+            .forEach {
+                error("Duplicated id ${it.value}")
+            }
+    }
+
     private companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListModel<*>>() {
             override fun areItemsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>): Boolean =
@@ -124,29 +132,31 @@ open class ModelAdapter(
 /**
  * Returns the model at [index]
  */
-fun ModelAdapter.getModelAt(index: Int): ListModel<*> = models[index]
+fun ModelAdapter.getModelAt(index: Int): ListModel<*> = currentModels[index]
 
 /**
  * Returns the index of the [model]
  */
-fun ModelAdapter.indexOfModel(model: ListModel<*>): Int = models.indexOf(model)
+fun ModelAdapter.indexOfModel(model: ListModel<*>): Int = currentModels.indexOf(model)
 
 /**
  * Adds the [model]
  */
 fun ModelAdapter.addModel(model: ListModel<*>) {
-    val newModels = models.toMutableList()
+    val newModels = currentModels.toMutableList()
     newModels.add(model)
-    setModels(newModels)
+    overrideModels(newModels)
+    notifyItemInserted(newModels.lastIndex)
 }
 
 /**
  * Adds the [model] at the [index]
  */
 fun ModelAdapter.addModel(index: Int, model: ListModel<*>) {
-    val newModels = models.toMutableList()
+    val newModels = currentModels.toMutableList()
     newModels.add(index, model)
-    setModels(newModels)
+    overrideModels(newModels)
+    notifyItemInserted(index)
 }
 
 /**
@@ -154,8 +164,10 @@ fun ModelAdapter.addModel(index: Int, model: ListModel<*>) {
  */
 fun ModelAdapter.addModels(vararg models: ListModel<*>) {
     val newModels = models.toMutableList()
+    val startIndex = newModels.lastIndex
     newModels.addAll(models)
-    setModels(newModels)
+    overrideModels(newModels)
+    notifyItemRangeInserted(startIndex, models.size)
 }
 
 /**
@@ -165,6 +177,7 @@ fun ModelAdapter.addModels(index: Int, vararg models: ListModel<*>) {
     val newModels = models.toMutableList()
     newModels.addAll(index, models.asList())
     setModels(newModels)
+    notifyItemRangeInserted(index, models.size)
 }
 
 /**
@@ -172,8 +185,10 @@ fun ModelAdapter.addModels(index: Int, vararg models: ListModel<*>) {
  */
 fun ModelAdapter.addModels(models: Iterable<ListModel<*>>) {
     val newModels = models.toMutableList()
+    val startIndex = newModels.lastIndex
     newModels.addAll(models)
-    setModels(newModels)
+    overrideModels(newModels)
+    notifyItemRangeInserted(startIndex, models.count())
 }
 
 /**
@@ -182,30 +197,45 @@ fun ModelAdapter.addModels(models: Iterable<ListModel<*>>) {
 fun ModelAdapter.addModels(index: Int, models: Iterable<ListModel<*>>) {
     val newModels = models.toMutableList()
     newModels.addAll(index, models.toList())
-    setModels(newModels)
+    overrideModels(newModels)
+    notifyItemRangeInserted(index, models.count())
 }
 
 /**
  * Removes the [model] if added
  */
 fun ModelAdapter.removeModel(model: ListModel<*>) {
-    val newModels = models.toMutableList()
-    newModels.remove(model)
-    setModels(newModels)
+    val newModels = currentModels.toMutableList()
+    val index = newModels.indexOf(model)
+    if (index != -1) {
+        newModels.removeAt(index)
+        overrideModels(newModels)
+        notifyItemRemoved(index)
+    }
+}
+
+fun ModelAdapter.removeModelAt(index: Int) {
+    val newModels = currentModels.toMutableList()
+    newModels.removeAt(index)
+    overrideModels(newModels)
+    notifyItemRemoved(index)
 }
 
 /**
  * Moves the the model at [from] to the [to] index
  */
 fun ModelAdapter.moveModel(from: Int, to: Int) {
-    val newModels = models.toMutableList()
+    val newModels = currentModels.toMutableList()
     Collections.swap(newModels, from, to)
-    setModels(newModels)
+    overrideModels(newModels)
+    notifyItemMoved(from, to)
 }
 
 /**
  * Clears all added models
  */
 fun ModelAdapter.clearModels() {
-    setModels(emptyList())
+    val oldModels = currentModels
+    overrideModels(emptyList())
+    notifyItemRangeRemoved(0, oldModels.size)
 }
