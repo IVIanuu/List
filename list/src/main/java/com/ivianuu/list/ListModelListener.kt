@@ -75,6 +75,20 @@ fun ListModel<*>.addListener(
     preUnbind, postUnbind
 ).also(this::addListener)
 
+fun ModelAdapter.addModelListener(
+    onCreateHolder: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
+    onBuildView: ((model: ListModel<*>, view: View) -> Unit)? = null,
+    preBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
+    postBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
+    preUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
+    postUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null
+): ListModelListener = ListModelListener(
+    onCreateHolder,
+    onBuildView,
+    preBind, postBind,
+    preUnbind, postUnbind
+).also(this::addModelListener)
+
 fun ModelController.addModelListener(
     onCreateHolder: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     onBuildView: ((model: ListModel<*>, view: View) -> Unit)? = null,

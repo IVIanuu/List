@@ -19,7 +19,6 @@ package com.ivianuu.list
 import android.os.Handler
 import android.os.Looper
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import java.util.*
 import java.util.concurrent.Executor
 
@@ -34,7 +33,6 @@ private val mainThreadExecutor = Executor {
 
 internal class AsyncModelDiffer(
     private val executor: Executor,
-    private val diffCallback: ItemCallback<ListModel<*>>,
     private val resultCallback: (DiffResult) -> Unit
 ) {
 
@@ -96,10 +94,10 @@ internal class AsyncModelDiffer(
             return
         }
 
-        val wrappedCallback = DiffCallback(previousList, newList, diffCallback)
+        val callback = DiffCallback(previousList, newList)
 
         executor.execute {
-            val result = DiffUtil.calculateDiff(wrappedCallback)
+            val result = DiffUtil.calculateDiff(callback)
             onRunCompleted(runGeneration, newList, DiffResult.diff(previousList, newList, result))
         }
     }
@@ -166,37 +164,20 @@ internal class AsyncModelDiffer(
 
     private class DiffCallback(
         val oldList: List<ListModel<*>>,
-        val newList: List<ListModel<*>>,
-        private val diffCallback: ItemCallback<ListModel<*>>
+        val newList: List<ListModel<*>>
     ) : DiffUtil.Callback() {
 
-        override fun getOldListSize(): Int {
-            return oldList.size
-        }
+        override fun getOldListSize(): Int = oldList.size
 
-        override fun getNewListSize(): Int {
-            return newList.size
-        }
+        override fun getNewListSize(): Int = newList.size
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return diffCallback.areItemsTheSame(
-                oldList[oldItemPosition],
-                newList[newItemPosition]
-            )
-        }
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            oldList[oldItemPosition].id == newList[newItemPosition].id
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return diffCallback.areContentsTheSame(
-                oldList[oldItemPosition],
-                newList[newItemPosition]
-            )
-        }
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            oldList[oldItemPosition] == newList[newItemPosition]
 
-        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-            return diffCallback.getChangePayload(
-                oldList[oldItemPosition],
-                newList[newItemPosition]
-            )
-        }
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? =
+            oldList[oldItemPosition]
     }
 }

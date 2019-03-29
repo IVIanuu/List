@@ -30,7 +30,7 @@ abstract class ListModel<H : ModelHolder> {
      */
     var id: Long = -1
         internal set(value) {
-            check(!addedToAdapter) { "cannot change the id of an added model" }
+            check(!addedToAdapter) { "cannot change the id model after being added to an adapter" }
             field = value
         }
 
@@ -40,12 +40,12 @@ abstract class ListModel<H : ModelHolder> {
     open val viewType: Int get() = layoutRes
 
     /**
-     * The layout res of this model which will be in [buildView] if not overriden
+     * The layout res of this model which will be in [buildView] if not overridden
      */
-    open val layoutRes = 0
+    open val layoutRes get() = 0
 
     /**
-     * All properties of this model which will be used to implement a correct [equals] and [hashCode]
+     * All properties of this model which will be used to produce a correct [equals] and [hashCode]
      */
     val properties = ModelProperties()
 

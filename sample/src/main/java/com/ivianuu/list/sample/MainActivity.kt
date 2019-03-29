@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.ivianuu.list.addModelListener
 import com.ivianuu.list.annotations.Model
 import com.ivianuu.list.common.LayoutContainerHolder
 import com.ivianuu.list.common.LayoutContainerModel
@@ -79,29 +79,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        controller.adapter.addModelListener(
+            preBind = { model, holder ->
+                println("pre bind $model $holder view type is ${model.viewType}")
+            },
+            postUnbind = { model, holder ->
+                println("post unbind $model $holder view type is ${model.viewType}")
+            }
+        )
+
         list.adapter = controller.adapter
-
-        controller.adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onChanged() {
-                println("on changed")
-            }
-
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                println("on item range changed position start: $positionStart, item count: $itemCount")
-            }
-
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                println("on item range inserted position start: $positionStart, item count: $itemCount")
-            }
-
-            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                println("on item range moved from position: $fromPosition, to position: $toPosition, item count: $itemCount")
-            }
-
-            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-                println("on item range removed position start: $positionStart, item count: $itemCount")
-            }
-        })
 
         ModelTouchHelper.dragging(list)
             .vertical()

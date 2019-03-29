@@ -17,7 +17,6 @@
 package com.ivianuu.list
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 import java.util.concurrent.Executor
@@ -29,15 +28,7 @@ open class ModelAdapter(
     diffingExecutor: Executor = ListPlugins.defaultDiffingExecutor
 ) : RecyclerView.Adapter<ModelViewHolder>() {
 
-    private val differ = AsyncModelDiffer(
-        diffingExecutor,
-        DIFF_CALLBACK
-    ) {
-        resultListener?.invoke(it)
-        it.dispatchTo(this)
-    }
-
-    var resultListener: ((DiffResult) -> Unit)? = null
+    private val differ = AsyncModelDiffer(diffingExecutor) { it.dispatchTo(this) }
 
     /**
      * All current models
@@ -128,17 +119,6 @@ open class ModelAdapter(
             .forEach {
                 error("Duplicated id ${it.value}")
             }
-    }
-
-    private companion object {
-        // todo merge into async model differ
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListModel<*>>() {
-            override fun areItemsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>): Boolean =
-                oldItem.id == newItem.id
-
-            override fun areContentsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>): Boolean =
-                oldItem == newItem
-        }
     }
 }
 
