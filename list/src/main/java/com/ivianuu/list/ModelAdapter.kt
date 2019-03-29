@@ -119,6 +119,7 @@ open class ModelAdapter(
     }
 
     private companion object {
+        // todo merge into async model differ
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListModel<*>>() {
             override fun areItemsTheSame(oldItem: ListModel<*>, newItem: ListModel<*>): Boolean =
                 oldItem.id == newItem.id

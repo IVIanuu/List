@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                         direction: Int
                     ) {
                         super.onSwipeCompleted(model, itemView, position, direction)
-                        models.removeAt(position)
+                        models.removeAt(position - 3)
                         controller.requestModelBuild()
                     }
                 }
