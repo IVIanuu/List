@@ -102,7 +102,7 @@ abstract class ListModel<H : ModelHolder>(
         key: String,
         doHash: Boolean = true
     ): ModelPropertyDelegate<T> = ModelPropertyDelegate(this, key, doHash) {
-        error("missing property with key $key use optionalProperty() for optional ones")
+        error("missing property with key '$key' use optionalProperty() for optional ones")
     }
 
     /**

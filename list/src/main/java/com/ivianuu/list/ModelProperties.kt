@@ -112,7 +112,7 @@ fun <T> ModelProperties.getProperty(key: String): T? = getPropertyEntry<T>(key)?
  * Returns the property value for [key] or throws
  */
 fun <T> ModelProperties.requireProperty(key: String): T = getProperty<T>(key)
-    ?: error("missing property for key $key")
+    ?: error("missing property for key '$key'")
 
 /**
  * Sets the property
