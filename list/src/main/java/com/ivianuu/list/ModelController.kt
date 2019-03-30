@@ -150,6 +150,16 @@ abstract class ModelController(
         adapter.removeModelListener(listener)
     }
 
+    inline operator fun <T : ListModel<*>> ListModelFactory<T>.invoke(
+        body: T.() -> Unit
+    ): T = create().apply(body).addTo(this@ModelController)
+
+    inline operator fun <T : ListModel<*>> T.invoke(body: T.() -> Unit): T =
+        apply(body).addTo(this@ModelController)
+
+    inline fun <T : ListModel<*>> T.add(body: T.() -> Unit): T =
+        apply(body).addTo(this@ModelController)
+
     private fun checkBuildingModels() {
         check(isBuildingModels) { "cannot add models outside of buildModels()" }
     }

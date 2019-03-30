@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.ivianuu.list.annotations
+package com.ivianuu.list
 
 /**
- * Generates dsl functions for a list model
+ * @author Manuel Wrage (IVIanuu)
  */
-@Target(AnnotationTarget.CLASS)
-annotation class Model
+abstract class ListModelFactory<T : ListModel<*>>(
+    private val factory: () -> T
+) {
+    fun create(): T = factory()
+}

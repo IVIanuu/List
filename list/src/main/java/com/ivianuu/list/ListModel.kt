@@ -23,7 +23,10 @@ import android.view.ViewGroup
 /**
  * Single item in a [ModelAdapter]
  */
-abstract class ListModel<H : ModelHolder> {
+abstract class ListModel<H : ModelHolder>(
+    id: Any? = null,
+    layoutRes: Int = -1
+) {
 
     /**
      * The unique id of this model
@@ -42,7 +45,7 @@ abstract class ListModel<H : ModelHolder> {
     /**
      * The layout res of this model which will be in [buildView] if not overridden
      */
-    open val layoutRes get() = 0
+    open val layoutRes = layoutRes
 
     /**
      * All properties of this model which will be used to produce a correct [equals] and [hashCode]
@@ -57,11 +60,15 @@ abstract class ListModel<H : ModelHolder> {
 
     protected abstract fun createHolder(): H
 
+    init {
+        id(id)
+    }
+
     /**
      * Will be called when a view for model should be created
      */
     protected open fun buildView(parent: ViewGroup): View {
-        check(layoutRes != 0) { "specify a layoutRes if you don't override buildView" }
+        check(layoutRes != -1) { "specify a layoutRes if you don't override buildView" }
         return LayoutInflater.from(parent.context).inflate(layoutRes, parent, false)
     }
 

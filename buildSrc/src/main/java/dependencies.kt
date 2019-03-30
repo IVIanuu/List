@@ -24,7 +24,6 @@ object Versions {
     const val bintray = "1.8.4"
     const val kotlin = "1.3.21"
     const val mavenGradle = "2.1"
-    const val processingX = "0.0.1-dev-2"
     const val stdlibx = "0.0.1-dev-4"
 }
 
@@ -43,8 +42,6 @@ object Deps {
 
     const val mavenGradlePlugin =
         "com.github.dcendents:android-maven-gradle-plugin:${Versions.mavenGradle}"
-
-    const val processingX = "com.ivianuu.processingx:processingx:${Versions.processingX}"
 
     const val stdlibx = "com.ivianuu.stdlibx:stdlibx:${Versions.stdlibx}"
 

@@ -32,6 +32,9 @@ open class LayoutContainerHolder : ModelHolder(), LayoutContainer {
 /**
  * A [ListModel] which uses [LayoutContainerHolder]s
  */
-abstract class LayoutContainerModel : ListModel<LayoutContainerHolder>() {
+abstract class LayoutContainerModel(
+    id: Any? = null,
+    layoutRes: Int = -1
+) : ListModel<LayoutContainerHolder>(id, layoutRes) {
     override fun createHolder(): LayoutContainerHolder = LayoutContainerHolder()
 }
