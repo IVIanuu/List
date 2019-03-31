@@ -21,8 +21,14 @@ package com.ivianuu.list
  */
 abstract class ModelController() {
 
+    /**
+     * The adapter baked by this controller
+     */
     open val adapter = ModelAdapter()
 
+    /**
+     * Whether or not models are currently building
+     */
     var isBuildingModels = false
         private set
 
