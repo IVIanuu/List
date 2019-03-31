@@ -24,7 +24,7 @@ import android.os.Looper
 internal val mainThreadHandler: Handler by lazy { createHandler(Looper.getMainLooper()) }
 
 internal val backgroundHandler: Handler by lazy {
-    val handlerThread = HandlerThread("list")
+    val handlerThread = HandlerThread("list:bg")
     handlerThread.start()
     createHandler(handlerThread.looper)
 }
