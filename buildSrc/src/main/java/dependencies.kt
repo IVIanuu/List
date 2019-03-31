@@ -4,7 +4,7 @@ object Build {
     const val applicationId = "com.ivianuu.list.sample"
     const val buildToolsVersion = "28.0.3"
     const val compileSdk = 28
-    const val minSdk = 14
+    const val minSdk = 16
     const val targetSdk = 28
 
     const val versionCode = 1
@@ -14,7 +14,7 @@ object Build {
 object Publishing {
     const val groupId = "com.ivianuu.list"
     const val vcsUrl = "https://github.com/IVIanuu/list"
-    const val version = "${Build.versionName}-dev-14"
+    const val version = "${Build.versionName}-dev-15"
 }
 
 object Versions {

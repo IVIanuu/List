@@ -16,20 +16,12 @@
 
 package com.ivianuu.list
 
-import android.os.Handler
-import java.util.concurrent.Executor
-
-private val delayedModelBuildHandler = Handler()
-
 /**
  * Controller of a underlying [ModelAdapter]
  */
-abstract class ModelController(
-    private val diffingExecutor: Executor = ListPlugins.defaultDiffingExecutor,
-    private val buildingExecutor: Executor = ListPlugins.defaultBuildingExecutor
-) {
+abstract class ModelController() {
 
-    open val adapter = ModelAdapter(diffingExecutor)
+    open val adapter = ModelAdapter()
 
     var isBuildingModels = false
         private set
@@ -51,10 +43,6 @@ abstract class ModelController(
         hasBuiltModelsEver = true
     }
 
-    private val delayedModelBuildAction: () -> Unit = {
-        buildingExecutor.execute(buildModelsAction)
-    }
-
     private var requestedModelBuildType = RequestedModelBuildType.NONE
 
     /**
@@ -63,7 +51,7 @@ abstract class ModelController(
     open fun requestModelBuild() {
         check(!isBuildingModels) { "cannot call requestModelBuild() inside buildModels()" }
         if (hasBuiltModelsEver) {
-            delayedModelBuildHandler.post(delayedModelBuildAction)
+            backgroundHandler.post(buildModelsAction)
         } else {
             buildModelsAction()
         }
@@ -94,7 +82,7 @@ abstract class ModelController(
         requestedModelBuildType =
             if (delayMs == 0L) RequestedModelBuildType.NEXT_FRAME else RequestedModelBuildType.DELAYED
 
-        delayedModelBuildHandler.postDelayed(delayedModelBuildAction, delayMs)
+        backgroundHandler.postDelayed(buildModelsAction, delayMs)
     }
 
     /**
@@ -103,7 +91,7 @@ abstract class ModelController(
     fun cancelPendingModelBuild(): Unit = synchronized(this) {
         if (requestedModelBuildType != RequestedModelBuildType.NONE) {
             requestedModelBuildType = RequestedModelBuildType.NONE
-            delayedModelBuildHandler.removeCallbacks(delayedModelBuildAction)
+            backgroundHandler.removeCallbacks(buildModelsAction)
         }
     }
 

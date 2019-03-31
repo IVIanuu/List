@@ -19,16 +19,13 @@ package com.ivianuu.list
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
-import java.util.concurrent.Executor
 
 /**
  * List adapter for [ListModel]s
  */
-open class ModelAdapter(
-    diffingExecutor: Executor = ListPlugins.defaultDiffingExecutor
-) : RecyclerView.Adapter<ModelViewHolder>() {
+open class ModelAdapter : RecyclerView.Adapter<ModelViewHolder>() {
 
-    private val differ = AsyncModelDiffer(diffingExecutor) { it.dispatchTo(this) }
+    private val differ = AsyncModelDiffer { it.dispatchTo(this) }
 
     /**
      * All current models

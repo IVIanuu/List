@@ -16,19 +16,12 @@
 
 package com.ivianuu.list.common
 
-import com.ivianuu.list.ListPlugins
 import com.ivianuu.list.ModelController
-import com.ivianuu.list.defaultBuildingExecutor
-import com.ivianuu.list.defaultDiffingExecutor
-import java.util.concurrent.Executor
 
 /**
  * Typed [ModelController]
  */
-abstract class Typed1ModelController<A>(
-    diffingExecutor: Executor = ListPlugins.defaultDiffingExecutor,
-    buildingExecutor: Executor = ListPlugins.defaultBuildingExecutor
-) : ModelController(diffingExecutor, buildingExecutor) {
+abstract class Typed1ModelController<A> : ModelController() {
 
     var data1: A? = null
         set(value) {

@@ -16,25 +16,10 @@
 
 package com.ivianuu.list
 
-import android.os.Handler
-import android.os.Looper
 import androidx.recyclerview.widget.DiffUtil
 import java.util.*
-import java.util.concurrent.Executor
 
-private val handler = Handler(Looper.getMainLooper())
-private val mainThreadExecutor = Executor {
-    if (Looper.myLooper() == Looper.getMainLooper()) {
-        it.run()
-    } else {
-        handler.post(it)
-    }
-}
-
-internal class AsyncModelDiffer(
-    private val executor: Executor,
-    private val resultCallback: (DiffResult) -> Unit
-) {
+internal class AsyncModelDiffer(private val resultCallback: (DiffResult) -> Unit) {
 
     private val generationTracker = GenerationTracker()
 
@@ -96,7 +81,7 @@ internal class AsyncModelDiffer(
 
         val callback = DiffCallback(previousList, newList)
 
-        executor.execute {
+        backgroundHandler.post {
             val result = DiffUtil.calculateDiff(callback)
             onRunCompleted(runGeneration, newList, DiffResult.diff(previousList, newList, result))
         }
@@ -109,7 +94,7 @@ internal class AsyncModelDiffer(
     ) {
         // We use an asynchronous handler so that the Runnable can be posted directly back to the main
         // thread without waiting on view invalidation synchronization.
-        mainThreadExecutor.execute {
+        mainThreadHandler.post {
             val dispatchResult = tryLatchList(newList, runGeneration)
             if (result != null && dispatchResult) {
                 resultCallback(result)

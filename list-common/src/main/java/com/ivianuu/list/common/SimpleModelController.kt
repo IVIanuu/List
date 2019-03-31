@@ -16,20 +16,14 @@
 
 package com.ivianuu.list.common
 
-import com.ivianuu.list.ListPlugins
 import com.ivianuu.list.ModelController
-import com.ivianuu.list.defaultBuildingExecutor
-import com.ivianuu.list.defaultDiffingExecutor
-import java.util.concurrent.Executor
 
 /**
  * Simple [ModelController] which takes invokes [buildModels] to build models
  */
 class SimpleModelController(
-    diffingExecutor: Executor = ListPlugins.defaultDiffingExecutor,
-    buildingExecutor: Executor = ListPlugins.defaultBuildingExecutor,
     private val buildModels: ModelController.() -> Unit
-) : ModelController(diffingExecutor, buildingExecutor) {
+) : ModelController() {
     override fun buildModels() {
         buildModels.invoke(this)
     }
