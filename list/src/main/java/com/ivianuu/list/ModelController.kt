@@ -127,7 +127,7 @@ abstract class ModelController(
     }
 
     private fun add(model: ListModel<*>) {
-        checkBuildingModels()
+        check(isBuildingModels) { "cannot add models outside of buildModels()" }
         currentModels.add(model)
     }
 
@@ -159,10 +159,6 @@ abstract class ModelController(
 
     inline fun <T : ListModel<*>> T.add(body: T.() -> Unit): T =
         apply(body).addTo(this@ModelController)
-
-    private fun checkBuildingModels() {
-        check(isBuildingModels) { "cannot add models outside of buildModels()" }
-    }
 
     private enum class RequestedModelBuildType {
         NONE, NEXT_FRAME, DELAYED
