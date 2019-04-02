@@ -17,19 +17,14 @@
 package com.ivianuu.list.common
 
 import androidx.recyclerview.widget.GridLayoutManager
-import com.ivianuu.list.ListModel
-import com.ivianuu.list.ModelAdapter
-import com.ivianuu.list.ModelController
-import com.ivianuu.list.getModelAt
-import com.ivianuu.list.getProperty
-import com.ivianuu.list.setProperty
+import com.ivianuu.list.*
 
 private const val KEY_SPAN_SIZE_OVERRIDE = "ListModelSpanSizeLookUp.spanSizeOverride"
 
 /**
  * Callback to provide the span size of a specific [ListModel]
  */
-interface SpanSizeCallback {
+interface SpanSizeProvider {
     fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int
 }
 
@@ -53,20 +48,20 @@ class ModelSpanSizeLookUp(
         val model = adapter.getModelAt(position)
         val spanCount = layoutManager.spanCount
         val itemCount = adapter.itemCount
-        val spanSizeOverride = model.getProperty<SpanSizeCallback>(KEY_SPAN_SIZE_OVERRIDE)
+        val spanSizeOverride = model.getProperty<SpanSizeProvider>(KEY_SPAN_SIZE_OVERRIDE)
         return spanSizeOverride?.getSpanSize(spanCount, position, itemCount)
-            ?: (model as? SpanSizeCallback)?.getSpanSize(spanCount, position, itemCount)
+            ?: (model as? SpanSizeProvider)?.getSpanSize(spanCount, position, itemCount)
             ?: defaultSpanSize
     }
 
 }
 
-fun ListModel<*>.overrideSpanSize(callback: SpanSizeCallback?) {
-    setProperty(KEY_SPAN_SIZE_OVERRIDE, callback, false)
+fun ListModel<*>.overrideSpanSize(provider: SpanSizeProvider?) {
+    setProperty(KEY_SPAN_SIZE_OVERRIDE, provider, false)
 }
 
 fun ListModel<*>.overrideSpanSize(callback: (totalSpanCount: Int, position: Int, itemCount: Int) -> Int) {
-    overrideSpanSize(object : SpanSizeCallback {
+    overrideSpanSize(object : SpanSizeProvider {
         override fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int =
             callback.invoke(totalSpanCount, position, itemCount)
     })
