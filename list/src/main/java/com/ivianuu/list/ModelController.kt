@@ -29,12 +29,12 @@ abstract class ModelController {
     /**
      * Whether or not models are currently building
      */
-    var isBuildingModels = false
+    @Volatile var isBuildingModels = false
         private set
 
     private val currentModels = mutableListOf<ListModel<*>>()
 
-    private var hasBuiltModelsEver = false
+    @Volatile private var hasBuiltModelsEver = false
 
     private val buildModelsAction: () -> Unit = {
         cancelPendingModelBuild()
