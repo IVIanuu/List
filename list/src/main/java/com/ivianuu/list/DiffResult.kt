@@ -39,8 +39,6 @@ internal class DiffResult private constructor(
         } else if (!newModels.isEmpty() && previousModels.isEmpty()) {
             callback.onInserted(0, newModels.size)
         }
-
-        // Else nothing changed!
     }
 
     companion object {

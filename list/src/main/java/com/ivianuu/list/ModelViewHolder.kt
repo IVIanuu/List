@@ -48,7 +48,7 @@ class ModelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     internal fun unbind() {
-        model?.unbindView(holder)
+        model?.unbindHolder(holder)
         model = null
     }
 

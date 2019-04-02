@@ -58,17 +58,20 @@ abstract class ListModel<H : ModelHolder>(
     private lateinit var adapter: ModelAdapter
     private var addedToAdapter = false
 
-    protected abstract fun createHolder(): H
-
     init {
         id(id)
     }
 
     /**
+     * Returns a new holder
+     */
+    protected abstract fun createHolder(): H
+
+    /**
      * Will be called when a view for model should be created
      */
     protected open fun buildView(parent: ViewGroup): View {
-        check(layoutRes != -1) { "specify a layoutRes if you don't override buildView" }
+        check(layoutRes != -1) { "specify a layoutRes or override buildView" }
         return LayoutInflater.from(parent.context).inflate(layoutRes, parent, false)
     }
 
@@ -146,7 +149,7 @@ abstract class ListModel<H : ModelHolder>(
         notifyListeners { it.postBind(this, holder) }
     }
 
-    internal fun unbindView(holder: H) {
+    internal fun unbindHolder(holder: H) {
         notifyListeners { it.preUnbind(this, holder) }
         requireSuperCalled { unbind(holder) }
         notifyListeners { it.postUnbind(this, holder) }
