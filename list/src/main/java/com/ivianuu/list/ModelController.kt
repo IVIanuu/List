@@ -57,18 +57,10 @@ abstract class ModelController {
     open fun requestModelBuild() {
         check(!isBuildingModels) { "cannot call requestModelBuild() inside buildModels()" }
         if (hasBuiltModelsEver) {
-            backgroundHandler.post(buildModelsAction)
+            requestDelayedModelBuild(0)
         } else {
             buildModelsAction()
         }
-    }
-
-    /**
-     * Requests a synchronous call to [buildModels]
-     */
-    open fun requestImmediateModelBuild() {
-        check(!isBuildingModels) { "cannot call requestImmediateModelBuild() inside buildModels()" }
-        buildModelsAction()
     }
 
     /**
