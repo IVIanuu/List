@@ -21,10 +21,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView.Adapter
 
-/**
- * Wraps the result of [AsyncModelDiffer.submitList].
- */
-class DiffResult private constructor(
+internal class DiffResult private constructor(
     val previousModels: List<ListModel<*>>,
     val newModels: List<ListModel<*>>,
     val differResult: DiffUtil.DiffResult?

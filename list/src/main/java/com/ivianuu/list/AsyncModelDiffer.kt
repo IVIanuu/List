@@ -25,9 +25,6 @@ internal class AsyncModelDiffer(private val resultCallback: (DiffResult) -> Unit
 
     @Volatile private var list: List<ListModel<*>> = emptyList()
 
-    /**
-     * The current list
-     */
     var currentList = emptyList<ListModel<*>>()
         private set
 

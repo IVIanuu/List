@@ -204,6 +204,9 @@ fun ModelAdapter.removeModel(model: ListModel<*>) {
     }
 }
 
+/**
+ * Removes the model at the [index]
+ */
 fun ModelAdapter.removeModelAt(index: Int) {
     val newModels = currentModels.toMutableList()
     newModels.removeAt(index)

@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
                     ) {
                         super.onModelMoved(fromPosition, toPosition, modelBeingMoved, itemView)
                         Collections.swap(models, fromPosition - 3, toPosition - 3)
-                        controller.requestDelayedModelBuild(500)
+                        controller.requestModelBuild()
                     }
                 }
             )

@@ -19,7 +19,7 @@ package com.ivianuu.list
 /**
  * Controller of a underlying [ModelAdapter]
  */
-abstract class ModelController() {
+abstract class ModelController {
 
     /**
      * The adapter baked by this controller
