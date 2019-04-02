@@ -49,7 +49,7 @@ abstract class ModelController {
         hasBuiltModelsEver = true
     }
 
-    private var requestedModelBuildType = RequestedModelBuildType.NONE
+    @Volatile private var requestedModelBuildType = RequestedModelBuildType.NONE
 
     /**
      * Requests a call to [buildModels]
