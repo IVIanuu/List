@@ -35,15 +35,13 @@ class ModelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
      */
     lateinit var holder: ModelHolder
         private set
-    private var holderCreated = false
 
     internal fun bind(model: ListModel<*>) {
         this.model = model as ListModel<ModelHolder>
 
-        if (!holderCreated) {
-            holderCreated = true
+        if (!this::holder.isInitialized) {
             holder = model.newHolder()
-            holder.bindView(itemView)
+            holder.setView(itemView)
         }
 
         model.bindHolder(holder)

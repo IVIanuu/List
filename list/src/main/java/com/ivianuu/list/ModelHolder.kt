@@ -33,12 +33,12 @@ abstract class ModelHolder {
      * Will be called when the view was created
      * This function can be used to bindHolder click listeners etc.
      */
-    protected open fun onBindView(view: View) {
+    protected open fun bindView(view: View) {
     }
 
-    internal fun bindView(view: View) {
+    internal fun setView(view: View) {
         this.view = view
-        onBindView(view)
+        bindView(view)
     }
 
 }
