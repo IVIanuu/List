@@ -24,8 +24,15 @@ apply(from = "https://raw.githubusercontent.com/IVIanuu/gradle-scripts/master/an
 apply(from = "https://raw.githubusercontent.com/IVIanuu/gradle-scripts/master/kt-android-ext.gradle")
 apply(from = "https://raw.githubusercontent.com/IVIanuu/gradle-scripts/master/mvn-publish.gradle")
 
+android {
+    testOptions.unitTests.isIncludeAndroidResources = true
+}
+
 dependencies {
     api(Deps.kotlinStdLib)
     api(Deps.androidxRecyclerView)
     api(Deps.stdlibx)
+
+    testImplementation(Deps.junit)
+    testImplementation(Deps.roboelectric)
 }

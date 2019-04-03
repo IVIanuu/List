@@ -55,7 +55,6 @@ abstract class ModelController {
      * Requests a call to [buildModels]
      */
     open fun requestModelBuild() {
-        check(!isBuildingModels) { "cannot call requestModelBuild() inside buildModels()" }
         if (hasBuiltModelsEver) {
             requestDelayedModelBuild(0)
         } else {
@@ -67,10 +66,6 @@ abstract class ModelController {
      * Enqueues a delayed call to [buildModels]
      */
     open fun requestDelayedModelBuild(delayMs: Long): Unit = synchronized(this) {
-        check(!isBuildingModels) {
-            "Cannot call requestDelayedModelBuild() from inside buildModels"
-        }
-
         if (requestedModelBuildType == RequestedModelBuildType.DELAYED) {
             cancelPendingModelBuild()
         } else if (requestedModelBuildType == RequestedModelBuildType.NEXT_FRAME) {
@@ -112,14 +107,14 @@ abstract class ModelController {
         models.forEach(this::add)
     }
 
-    private fun add(model: ListModel<*>) {
-        check(isBuildingModels) { "cannot add models outside of buildModels()" }
-        currentModels.add(model)
-    }
-
     @PublishedApi
     internal fun addInternal(model: ListModel<*>) {
         add(model)
+    }
+
+    private fun add(model: ListModel<*>) {
+        check(isBuildingModels) { "cannot add models outside of buildModels()" }
+        currentModels.add(model)
     }
 
     /**
