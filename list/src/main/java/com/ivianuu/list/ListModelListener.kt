@@ -17,6 +17,7 @@
 package com.ivianuu.list
 
 import android.view.View
+import com.ivianuu.closeable.Closeable
 
 /**
  * Listener for [ListModel]s
@@ -43,22 +44,22 @@ interface ListModelListener {
 
 }
 
-fun ListModel<*>.doOnCreateHolder(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): ListModelListener =
+fun ListModel<*>.doOnCreateHolder(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): Closeable =
     addListener(onCreateHolder = block)
 
-fun ListModel<*>.doOnBuildView(block: (model: ListModel<*>, view: View) -> Unit): ListModelListener =
+fun ListModel<*>.doOnBuildView(block: (model: ListModel<*>, view: View) -> Unit): Closeable =
     addListener(onBuildView = block)
 
-fun ListModel<*>.doOnPreBind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): ListModelListener =
+fun ListModel<*>.doOnPreBind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): Closeable =
     addListener(preBind = block)
 
-fun ListModel<*>.doOnPostBind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): ListModelListener =
+fun ListModel<*>.doOnPostBind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): Closeable =
     addListener(postBind = block)
 
-fun ListModel<*>.doOnPreUnbind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): ListModelListener =
+fun ListModel<*>.doOnPreUnbind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): Closeable =
     addListener(preUnbind = block)
 
-fun ListModel<*>.doOnPostUnbind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): ListModelListener =
+fun ListModel<*>.doOnPostUnbind(block: (model: ListModel<*>, holder: ModelHolder) -> Unit): Closeable =
     addListener(postUnbind = block)
 
 fun ListModel<*>.addListener(
@@ -68,12 +69,12 @@ fun ListModel<*>.addListener(
     postBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     preUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     postUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null
-): ListModelListener = ListModelListener(
+): Closeable = ListModelListener(
     onCreateHolder,
     onBuildView,
     preBind, postBind,
     preUnbind, postUnbind
-).also(this::addListener)
+).let(this::addListener)
 
 fun ModelAdapter.addModelListener(
     onCreateHolder: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
@@ -82,12 +83,12 @@ fun ModelAdapter.addModelListener(
     postBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     preUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     postUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null
-): ListModelListener = ListModelListener(
+): Closeable = ListModelListener(
     onCreateHolder,
     onBuildView,
     preBind, postBind,
     preUnbind, postUnbind
-).also(this::addModelListener)
+).let(this::addModelListener)
 
 fun ModelController.addModelListener(
     onCreateHolder: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
@@ -96,12 +97,12 @@ fun ModelController.addModelListener(
     postBind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     preUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,
     postUnbind: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null
-): ListModelListener = ListModelListener(
+): Closeable = ListModelListener(
     onCreateHolder,
     onBuildView,
     preBind, postBind,
     preUnbind, postUnbind
-).also(this::addModelListener)
+).let(this::addModelListener)
 
 fun ListModelListener(
     onCreateHolder: ((model: ListModel<*>, holder: ModelHolder) -> Unit)? = null,

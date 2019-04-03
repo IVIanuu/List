@@ -16,6 +16,8 @@
 
 package com.ivianuu.list
 
+import com.ivianuu.closeable.Closeable
+
 /**
  * Controller of a underlying [ModelAdapter]
  */
