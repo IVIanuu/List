@@ -1,0 +1,88 @@
+/*
+ * Copyright 2018 Manuel Wrage
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.ivianuu.list
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class ModelPropertiesTest {
+
+    private val properties = ModelProperties()
+
+    @Test
+    fun testSetGetProperties() {
+        assertNull(properties.getProperty<String>("key"))
+        properties.setProperty("key", "value")
+        assertEquals("value", properties.getProperty<String>("key"))
+    }
+
+    @Test
+    fun testEquals() {
+        val otherProperties = ModelProperties()
+        properties.setProperty("key", false)
+        otherProperties.setProperty("key", true)
+        assertNotEquals(properties, otherProperties)
+
+        otherProperties.setProperty("key", false)
+        assertEquals(properties, otherProperties)
+    }
+
+    @Test
+    fun testInitializeValuesOnModelAdded() {
+        var initialized = false
+        ModelPropertyDelegate(properties, "key") {
+            initialized = true
+            "value"
+        }
+
+        properties.modelAdded()
+
+        assertTrue(initialized)
+    }
+
+    @Test
+    fun testAccessUninitializedValueBeforeModelAdded() {
+        ModelPropertyDelegate(properties, "key") { "value" }
+        assertEquals("value", properties.getProperty<String>("key"))
+    }
+
+    @Test
+    fun testDoNotAllowMutationAfterModelBeingAdded() {
+        properties.modelAdded()
+        val throwed = try {
+            properties.setProperty("key", "value")
+            false
+        } catch (e: Exception) {
+            true
+        }
+
+        assertTrue(throwed)
+    }
+
+    @Test
+    fun testExcludeDoNotHashFromEquals() {
+        properties.setProperty("key", "value")
+        val otherProperties = ModelProperties()
+        otherProperties.setProperty("key", "value")
+        otherProperties.setProperty("ignored", "ignored", false)
+        assertEquals(properties, otherProperties)
+    }
+
+}

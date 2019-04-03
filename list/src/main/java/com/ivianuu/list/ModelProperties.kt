@@ -38,8 +38,14 @@ class ModelProperties internal constructor() {
     /**
      * Returns the [ModelProperty] for the [key]
      */
-    fun <T> getPropertyEntry(key: String): ModelProperty<T>? =
-        _entries[key] as? ModelProperty<T>
+    fun <T> getPropertyEntry(key: String): ModelProperty<T>? {
+        // try to initialize the value if not added yet
+        if (!modelAdded) {
+            uninitializedDelegates.remove(key)?.initializeValue()
+        }
+
+        return _entries[key] as? ModelProperty<T>
+    }
 
     /**
      * Sets the [property]
@@ -138,14 +144,14 @@ data class ModelProperty<T>(
  * Delegate which will be used to read and write [ModelProperties] in [ListModel]s
  */
 class ModelPropertyDelegate<T>(
-    private val model: ListModel<*>,
+    private val properties: ModelProperties,
     internal val key: String,
     private val doHash: Boolean = true,
     private val defaultValue: () -> T
 ) : ReadWriteProperty<ListModel<*>, T> {
 
     init {
-        model.properties.registerDelegate(this)
+        properties.registerDelegate(this)
     }
 
     override fun getValue(thisRef: ListModel<*>, property: KProperty<*>): T {
@@ -153,7 +159,7 @@ class ModelPropertyDelegate<T>(
     }
 
     override fun setValue(thisRef: ListModel<*>, property: KProperty<*>, value: T) {
-        model.properties.setProperty(key, value, doHash)
+        properties.setProperty(key, value, doHash)
     }
 
     internal fun initializeValue() {
@@ -161,7 +167,7 @@ class ModelPropertyDelegate<T>(
     }
 
     private fun getValueInternal(): T {
-        var property = model.properties.getPropertyEntry<T>(key)
+        var property = properties.getPropertyEntry<T>(key)
 
         if (property == null) {
             property = ModelProperty(
@@ -170,7 +176,7 @@ class ModelPropertyDelegate<T>(
                 doHash
             )
 
-            model.properties.setProperty(property)
+            properties.setProperty(property)
         }
 
         return property.value

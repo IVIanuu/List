@@ -96,7 +96,7 @@ abstract class ListModel<H : ModelHolder>(
         key: String,
         doHash: Boolean = true,
         defaultValue: () -> T
-    ): ModelPropertyDelegate<T> = ModelPropertyDelegate(this, key, doHash, defaultValue)
+    ): ModelPropertyDelegate<T> = ModelPropertyDelegate(properties, key, doHash, defaultValue)
 
     /**
      * Registers a non null property
@@ -104,7 +104,7 @@ abstract class ListModel<H : ModelHolder>(
     protected fun <T> requiredProperty(
         key: String,
         doHash: Boolean = true
-    ): ModelPropertyDelegate<T> = ModelPropertyDelegate(this, key, doHash) {
+    ): ModelPropertyDelegate<T> = ModelPropertyDelegate(properties, key, doHash) {
         error("missing property with key '$key' use optionalProperty() for optional ones")
     }
 
@@ -115,7 +115,7 @@ abstract class ListModel<H : ModelHolder>(
         key: String,
         doHash: Boolean = true
     ): ModelPropertyDelegate<T?> =
-        ModelPropertyDelegate(this, key, doHash) { null }
+        ModelPropertyDelegate(properties, key, doHash) { null }
 
     /**
      * Adds the [listener]
