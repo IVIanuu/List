@@ -120,9 +120,8 @@ abstract class ModelController {
     /**
      * Adds the [listener] to all [ListModel]s
      */
-    fun addModelListener(listener: ListModelListener) {
+    fun addModelListener(listener: ListModelListener): Closeable =
         adapter.addModelListener(listener)
-    }
 
     /**
      * Removes the previously added [listener]

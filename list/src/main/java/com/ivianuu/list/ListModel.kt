@@ -19,6 +19,7 @@ package com.ivianuu.list
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.ivianuu.closeable.Closeable
 
 /**
  * Single item in a [ModelAdapter]
@@ -120,8 +121,9 @@ abstract class ListModel<H : ModelHolder>(
     /**
      * Adds the [listener]
      */
-    fun addListener(listener: ListModelListener) {
+    fun addListener(listener: ListModelListener): Closeable {
         listeners.add(listener)
+        return Closeable { removeListener(listener) }
     }
 
     /**

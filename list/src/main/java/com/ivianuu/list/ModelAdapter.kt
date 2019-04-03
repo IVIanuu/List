@@ -18,6 +18,7 @@ package com.ivianuu.list
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.ivianuu.closeable.Closeable
 import java.util.*
 
 /**
@@ -98,8 +99,9 @@ open class ModelAdapter : RecyclerView.Adapter<ModelViewHolder>() {
     /**
      * Adds the [listener] to all [ListModel]s
      */
-    fun addModelListener(listener: ListModelListener) {
+    fun addModelListener(listener: ListModelListener): Closeable {
         _modelListeners.add(listener)
+        return Closeable { removeModelListener(listener) }
     }
 
     /**
