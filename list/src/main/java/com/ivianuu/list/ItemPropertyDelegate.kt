@@ -67,7 +67,6 @@ class ItemPropertyDelegate<T>(
                 key
             }
         }
-
     }
 
 }

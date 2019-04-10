@@ -24,7 +24,7 @@ import kotlinx.android.synthetic.main.item_count.count
 import kotlinx.android.synthetic.main.item_simple.title
 
 class ButtonItem : KotlinItem(layoutRes = R.layout.item_button) {
-    var buttonText by idProperty<String>("buttonText")
+    var buttonText by idProperty<String>()
 
     override fun bind(holder: KotlinHolder) {
         super.bind(holder)
@@ -35,7 +35,7 @@ class ButtonItem : KotlinItem(layoutRes = R.layout.item_button) {
 }
 
 class CountItem : KotlinItem(id = "count", layoutRes = R.layout.item_count) {
-    var count by requiredProperty<Int>("count")
+    var count by requiredProperty<Int>()
 
     override fun bind(holder: KotlinHolder) {
         super.bind(holder)
@@ -46,7 +46,7 @@ class CountItem : KotlinItem(id = "count", layoutRes = R.layout.item_count) {
 }
 
 class SimpleItem : KotlinItem(layoutRes = R.layout.item_simple) {
-    var text by idProperty<String>("text")
+    var text by idProperty<String>()
 
     override fun bind(holder: KotlinHolder) {
         super.bind(holder)
