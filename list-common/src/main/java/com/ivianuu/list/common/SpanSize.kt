@@ -19,17 +19,17 @@ package com.ivianuu.list.common
 import androidx.recyclerview.widget.GridLayoutManager
 import com.ivianuu.list.*
 
-private const val KEY_SPAN_SIZE_OVERRIDE = "ListModelSpanSizeLookUp.spanSizeOverride"
+private const val KEY_SPAN_SIZE_OVERRIDE = "ItemSpanSizeLookUp.spanSizeOverride"
 
 /**
- * Callback to provide the span size of a specific [ListModel]
+ * Callback to provide the span size of a specific [Item]
  */
 interface SpanSizeProvider {
     fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int
 }
 
-class ModelSpanSizeLookup(
-    private val adapter: ModelAdapter,
+class ItemSpanSizeLookup(
+    private val adapter: ItemAdapter,
     private val layoutManager: GridLayoutManager
 ) : GridLayoutManager.SpanSizeLookup() {
 
@@ -40,27 +40,27 @@ class ModelSpanSizeLookup(
     }
 
     constructor(
-        controller: ModelController,
+        controller: ItemController,
         layoutManager: GridLayoutManager
     ) : this(controller.adapter, layoutManager)
 
     override fun getSpanSize(position: Int): Int {
-        val model = adapter.getModelAt(position)
+        val item = adapter.getItemAt(position)
         val spanCount = layoutManager.spanCount
         val itemCount = adapter.itemCount
-        val spanSizeOverride = model.getProperty<SpanSizeProvider>(KEY_SPAN_SIZE_OVERRIDE)
+        val spanSizeOverride = item.getProperty<SpanSizeProvider>(KEY_SPAN_SIZE_OVERRIDE)
         return spanSizeOverride?.getSpanSize(spanCount, position, itemCount)
-            ?: (model as? SpanSizeProvider)?.getSpanSize(spanCount, position, itemCount)
+            ?: (item as? SpanSizeProvider)?.getSpanSize(spanCount, position, itemCount)
             ?: defaultSpanSize
     }
 
 }
 
-fun ListModel<*>.overrideSpanSize(provider: SpanSizeProvider?) {
+fun Item<*>.overrideSpanSize(provider: SpanSizeProvider?) {
     setProperty(KEY_SPAN_SIZE_OVERRIDE, provider, false)
 }
 
-fun ListModel<*>.overrideSpanSize(callback: (totalSpanCount: Int, position: Int, itemCount: Int) -> Int) {
+fun Item<*>.overrideSpanSize(callback: (totalSpanCount: Int, position: Int, itemCount: Int) -> Int) {
     overrideSpanSize(object : SpanSizeProvider {
         override fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int =
             callback.invoke(totalSpanCount, position, itemCount)

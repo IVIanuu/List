@@ -14,31 +14,27 @@
  * limitations under the License.
  */
 
-package com.ivianuu.list
+package com.ivianuu.list.common
 
 import android.view.View
+import com.ivianuu.list.Holder
+import com.ivianuu.list.Item
+import kotlinx.android.extensions.LayoutContainer
 
 /**
- * View holder for [ListModel]s
+ * A [Holder] which is also a [LayoutContainer]
  */
-abstract class ModelHolder {
+open class KotlinHolder : Holder(), LayoutContainer {
+    override val containerView: View
+        get() = view
+}
 
-    /**
-     * The view of this holder
-     */
-    lateinit var view: View
-        private set
-
-    /**
-     * Will be called when the view was created
-     * This function can be used to bindHolder click listeners etc.
-     */
-    protected open fun bindView(view: View) {
-    }
-
-    internal fun setView(view: View) {
-        this.view = view
-        bindView(view)
-    }
-
+/**
+ * A [Item] which uses [KotlinHolder]s
+ */
+abstract class KotlinItem(
+    id: Any? = null,
+    layoutRes: Int = -1
+) : Item<KotlinHolder>(id, layoutRes) {
+    override fun createHolder(): KotlinHolder = KotlinHolder()
 }

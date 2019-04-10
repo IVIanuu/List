@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package com.ivianuu.list
+package com.ivianuu.list.common
+
+import com.ivianuu.list.ItemController
 
 /**
- * @author Manuel Wrage (IVIanuu)
+ * Simple [ItemController] which takes invokes [buildItems] to build items
  */
-abstract class ListModelFactory<T : ListModel<*>>(
-    private val factory: () -> T
-) {
-    fun create(): T = factory()
+class SimpleItemController(
+    private val buildItems: ItemController.() -> Unit
+) : ItemController() {
+    override fun buildItems() {
+        buildItems.invoke(this)
+    }
 }
+
+/**
+ * Returns a [SimpleItemController] which uses [buildItems] to build it's items
+ */
+fun itemController(buildItems: ItemController.() -> Unit): SimpleItemController =
+    SimpleItemController(buildItems = buildItems)

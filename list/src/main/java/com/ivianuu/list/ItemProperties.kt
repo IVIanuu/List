@@ -17,71 +17,71 @@
 package com.ivianuu.list
 
 /**
- * Properties of a [ListModel]
+ * Properties of a [Item]
  */
-class ModelProperties internal constructor() {
+class ItemProperties internal constructor() {
 
     /**
      * All properties
      */
-    val entries: Map<String, ModelProperty<*>> get() = _entries
-    private val _entries = mutableMapOf<String, ModelProperty<*>>()
+    val entries: Map<String, ItemProperty<*>> get() = _entries
+    private val _entries = mutableMapOf<String, ItemProperty<*>>()
 
-    private var modelAdded = false
+    private var itemAdded = false
 
     private val uninitializedDelegates =
-        mutableMapOf<String, ModelPropertyDelegate<*>>()
+        mutableMapOf<String, ItemPropertyDelegate<*>>()
 
     /**
-     * Returns the [ModelProperty] for the [key]
+     * Returns the [ItemProperty] for the [key]
      */
-    fun <T> getPropertyEntry(key: String): ModelProperty<T>? {
+    fun <T> getPropertyEntry(key: String): ItemProperty<T>? {
         // try to initialize the value if not added yet
-        if (!modelAdded) {
+        if (!itemAdded) {
             uninitializedDelegates.remove(key)?.initializeValue()
         }
 
-        return _entries[key] as? ModelProperty<T>
+        return _entries[key] as? ItemProperty<T>
     }
 
     /**
      * Sets the [property]
      */
     fun <T> setProperty(
-        property: ModelProperty<T>
+        property: ItemProperty<T>
     ) {
-        check(!modelAdded) { "cannot change properties on added models" }
+        check(!itemAdded) { "cannot change properties on added items" }
         _entries[property.key] = property
         uninitializedDelegates.remove(property.key)
     }
 
-    internal fun modelAdded() {
+    internal fun itemAdded() {
         // force init the value of all delegates to have consistent equals() and hashCode() results
         uninitializedDelegates.values.toList()
-            .forEach(ModelPropertyDelegate<*>::initializeValue)
+            .forEach(ItemPropertyDelegate<*>::initializeValue)
         uninitializedDelegates.clear()
 
-        modelAdded = true
+        itemAdded = true
     }
 
-    internal fun registerDelegate(delegate: ModelPropertyDelegate<*>) {
-        check(!modelAdded) { "cannot change properties on added models" }
+    internal fun registerDelegate(delegate: ItemPropertyDelegate<*>) {
+        check(!itemAdded) { "cannot change properties on added items" }
         uninitializedDelegates[delegate.key] = delegate
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is ModelProperties) return false
+        if (other !is ItemProperties) return false
 
         // get all hashable properties and compare them
         val entries = _entries
-            .filterValues(ModelProperty<*>::doHash)
-            .map(Map.Entry<String, ModelProperty<*>>::value)
-            .map(ModelProperty<*>::value)
+            .filterValues(ItemProperty<*>::doHash)
+            .map(Map.Entry<String, ItemProperty<*>>::value)
+            .map(ItemProperty<*>::value)
         val otherEntries = other._entries
-            .filterValues(ModelProperty<*>::doHash)
-            .map(Map.Entry<String, ModelProperty<*>>::value)
-            .map(ModelProperty<*>::value)
+            .filterValues(ItemProperty<*>::doHash)
+            .map(Map.Entry<String, ItemProperty<*>>::value)
+            .map(ItemProperty<*>::value)
         if (entries != otherEntries) return false
 
         return true
@@ -90,16 +90,16 @@ class ModelProperties internal constructor() {
     override fun hashCode(): Int {
         // filter out non hashable properties
         val entries = _entries
-            .filterValues(ModelProperty<*>::doHash)
-            .map(Map.Entry<String, ModelProperty<*>>::value)
-            .map(ModelProperty<*>::value)
+            .filterValues(ItemProperty<*>::doHash)
+            .map(Map.Entry<String, ItemProperty<*>>::value)
+            .map(ItemProperty<*>::value)
         return entries.hashCode()
     }
 
     override fun toString(): String {
         val entries = _entries
-            .map(Map.Entry<String, ModelProperty<*>>::value)
-            .associateBy(ModelProperty<*>::key)
+            .map(Map.Entry<String, ItemProperty<*>>::value)
+            .associateBy(ItemProperty<*>::key)
             .mapValues { it.value.value }
         return entries.toString()
     }
@@ -109,29 +109,29 @@ class ModelProperties internal constructor() {
 /**
  * Returns the property value for [key] or null
  */
-fun <T> ModelProperties.getProperty(key: String): T? = getPropertyEntry<T>(key)?.value
+fun <T> ItemProperties.getProperty(key: String): T? = getPropertyEntry<T>(key)?.value
 
 /**
  * Returns the property value for [key] or throws
  */
-fun <T> ModelProperties.requireProperty(key: String): T = getProperty<T>(key)
+fun <T> ItemProperties.requireProperty(key: String): T = getProperty<T>(key)
     ?: error("missing property for key '$key'")
 
 /**
  * Sets the property
  */
-fun <T> ModelProperties.setProperty(
+fun <T> ItemProperties.setProperty(
     key: String,
     value: T,
     doHash: Boolean = true
 ) {
-    setProperty(ModelProperty(key, value, doHash))
+    setProperty(ItemProperty(key, value, doHash))
 }
 
 /**
- * Entry of [ModelProperties]
+ * Entry of [ItemProperties]
  */
-data class ModelProperty<T>(
+data class ItemProperty<T>(
     val key: String,
     val value: T,
     val doHash: Boolean = true

@@ -17,16 +17,16 @@
 package com.ivianuu.list.common
 
 import android.view.View
-import com.ivianuu.list.ListModel
-import com.ivianuu.list.ModelHolder
+import com.ivianuu.list.Holder
+import com.ivianuu.list.Item
 import com.ivianuu.list.addListener
 
 /**
  * Notifies the [block] on each click to the result of [viewProvider]
  */
-fun <T : ListModel<H>, H : ModelHolder> T.onClick(
+fun <T : Item<H>, H : Holder> T.onClick(
     viewProvider: (H) -> View = { it.view },
-    block: (model: T, view: View) -> Unit
+    block: (item: T, view: View) -> Unit
 ) {
     val listener = View.OnClickListener { block(this, it) }
     addListener(
@@ -38,9 +38,9 @@ fun <T : ListModel<H>, H : ModelHolder> T.onClick(
 /**
  * Notifies the [block] on each click on the view with the [viewId]
  */
-fun <T : ListModel<H>, H : ModelHolder> T.onClick(
+fun <T : Item<H>, H : Holder> T.onClick(
     viewId: Int,
-    block: (model: T, view: View) -> Unit
+    block: (item: T, view: View) -> Unit
 ) {
     onClick({ it.view.findViewById(viewId) }, block)
 }
@@ -48,9 +48,9 @@ fun <T : ListModel<H>, H : ModelHolder> T.onClick(
 /**
  * Notifies the [block] on each long click to the result of [viewProvider]
  */
-fun <T : ListModel<H>, H : ModelHolder> T.onLongClick(
+fun <T : Item<H>, H : Holder> T.onLongClick(
     viewProvider: (H) -> View = { it.view },
-    block: (model: T, view: View) -> Boolean
+    block: (item: T, view: View) -> Boolean
 ) {
     val listener = View.OnLongClickListener { block(this, it) }
     addListener(
@@ -62,9 +62,9 @@ fun <T : ListModel<H>, H : ModelHolder> T.onLongClick(
 /**
  * Notifies the [block] on each long click on the view with the [viewId]
  */
-fun <T : ListModel<H>, H : ModelHolder> T.onLongClick(
+fun <T : Item<H>, H : Holder> T.onLongClick(
     viewId: Int,
-    block: (model: T, view: View) -> Boolean
+    block: (item: T, view: View) -> Boolean
 ) {
     onLongClick({ it.view.findViewById(viewId) }, block)
 }

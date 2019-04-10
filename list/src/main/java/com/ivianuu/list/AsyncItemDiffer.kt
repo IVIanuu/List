@@ -19,13 +19,13 @@ package com.ivianuu.list
 import androidx.recyclerview.widget.DiffUtil
 import java.util.*
 
-internal class AsyncModelDiffer(private val resultCallback: (DiffResult) -> Unit) {
+internal class AsyncItemDiffer(private val resultCallback: (DiffResult) -> Unit) {
 
     private val generationTracker = GenerationTracker()
 
-    @Volatile private var list: List<ListModel<*>> = emptyList()
+    @Volatile private var list: List<Item<*>> = emptyList()
 
-    var currentList = emptyList<ListModel<*>>()
+    var currentList = emptyList<Item<*>>()
         private set
 
     val isDiffInProgress: Boolean
@@ -35,7 +35,7 @@ internal class AsyncModelDiffer(private val resultCallback: (DiffResult) -> Unit
         return generationTracker.finishMaxGeneration()
     }
 
-    fun forceListOverride(newList: List<ListModel<*>>): Boolean {
+    fun forceListOverride(newList: List<Item<*>>): Boolean {
         // We need to make sure that generation changes and list updates are synchronized
         val interruptedDiff = cancelDiff()
         val generation = generationTracker.incrementAndGetNextScheduled()
@@ -43,9 +43,9 @@ internal class AsyncModelDiffer(private val resultCallback: (DiffResult) -> Unit
         return interruptedDiff
     }
 
-    fun submitList(newList: List<ListModel<*>>) {
+    fun submitList(newList: List<Item<*>>) {
         val runGeneration: Int
-        val previousList: List<ListModel<*>>
+        val previousList: List<Item<*>>
 
         synchronized(this) {
             // Incrementing generation means any currently-running diffs are discarded when they finish
@@ -86,7 +86,7 @@ internal class AsyncModelDiffer(private val resultCallback: (DiffResult) -> Unit
 
     private fun onRunCompleted(
         runGeneration: Int,
-        newList: List<ListModel<*>>,
+        newList: List<Item<*>>,
         result: DiffResult?
     ) {
         // We use an asynchronous handler so that the Runnable can be posted directly back to the main
@@ -100,7 +100,7 @@ internal class AsyncModelDiffer(private val resultCallback: (DiffResult) -> Unit
     }
 
     private fun tryLatchList(
-        newList: List<ListModel<*>>,
+        newList: List<Item<*>>,
         runGeneration: Int
     ): Boolean {
         if (generationTracker.finishGeneration(runGeneration)) {
@@ -145,8 +145,8 @@ internal class AsyncModelDiffer(private val resultCallback: (DiffResult) -> Unit
     }
 
     private class DiffCallback(
-        val oldList: List<ListModel<*>>,
-        val newList: List<ListModel<*>>
+        val oldList: List<Item<*>>,
+        val newList: List<Item<*>>
     ) : DiffUtil.Callback() {
 
         override fun getOldListSize(): Int = oldList.size

@@ -22,9 +22,9 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class ModelPropertiesTest {
+class ItemPropertiesTest {
 
-    private val properties = ModelProperties()
+    private val properties = ItemProperties()
 
     @Test
     fun testSetGetProperties() {
@@ -35,7 +35,7 @@ class ModelPropertiesTest {
 
     @Test
     fun testEquals() {
-        val otherProperties = ModelProperties()
+        val otherProperties = ItemProperties()
         properties.setProperty("key", false)
         otherProperties.setProperty("key", true)
         assertNotEquals(properties, otherProperties)
@@ -45,27 +45,27 @@ class ModelPropertiesTest {
     }
 
     @Test
-    fun testInitializeValuesOnModelAdded() {
+    fun testInitializeValuesOnItemAdded() {
         var initialized = false
-        ModelPropertyDelegate(properties, "key") {
+        ItemPropertyDelegate(properties, "key") {
             initialized = true
             "value"
         }
 
-        properties.modelAdded()
+        properties.itemAdded()
 
         assertTrue(initialized)
     }
 
     @Test
-    fun testAccessUninitializedValueBeforeModelAdded() {
-        ModelPropertyDelegate(properties, "key") { "value" }
+    fun testAccessUninitializedValueBeforeItemAdded() {
+        ItemPropertyDelegate(properties, "key") { "value" }
         assertEquals("value", properties.getProperty<String>("key"))
     }
 
     @Test
-    fun testDoNotAllowMutationAfterModelBeingAdded() {
-        properties.modelAdded()
+    fun testDoNotAllowMutationAfterItemBeingAdded() {
+        properties.itemAdded()
         val throwed = try {
             properties.setProperty("key", "value")
             false
@@ -79,7 +79,7 @@ class ModelPropertiesTest {
     @Test
     fun testExcludeDoNotHashFromEquals() {
         properties.setProperty("key", "value")
-        val otherProperties = ModelProperties()
+        val otherProperties = ItemProperties()
         otherProperties.setProperty("key", "value")
         otherProperties.setProperty("ignored", "ignored", false)
         assertEquals(properties, otherProperties)

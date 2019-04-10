@@ -22,8 +22,8 @@ import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView.Adapter
 
 internal class DiffResult private constructor(
-    val previousModels: List<ListModel<*>>,
-    val newModels: List<ListModel<*>>,
+    val previousItems: List<Item<*>>,
+    val newItems: List<Item<*>>,
     val differResult: DiffUtil.DiffResult?
 ) {
 
@@ -34,33 +34,33 @@ internal class DiffResult private constructor(
     fun dispatchTo(callback: ListUpdateCallback) {
         if (differResult != null) {
             differResult.dispatchUpdatesTo(callback)
-        } else if (newModels.isEmpty() && !previousModels.isEmpty()) {
-            callback.onRemoved(0, previousModels.size)
-        } else if (!newModels.isEmpty() && previousModels.isEmpty()) {
-            callback.onInserted(0, newModels.size)
+        } else if (newItems.isEmpty() && !previousItems.isEmpty()) {
+            callback.onRemoved(0, previousItems.size)
+        } else if (!newItems.isEmpty() && previousItems.isEmpty()) {
+            callback.onInserted(0, newItems.size)
         }
     }
 
     companion object {
 
-        fun noop(models: List<ListModel<*>>): DiffResult {
-            return DiffResult(models, models, null)
+        fun noop(items: List<Item<*>>): DiffResult {
+            return DiffResult(items, items, null)
         }
 
-        fun inserted(newModels: List<ListModel<*>>): DiffResult {
-            return DiffResult(emptyList(), newModels, null)
+        fun inserted(newItems: List<Item<*>>): DiffResult {
+            return DiffResult(emptyList(), newItems, null)
         }
 
-        fun cleared(previousModels: List<ListModel<*>>): DiffResult {
-            return DiffResult(previousModels, emptyList(), null)
+        fun cleared(previousItems: List<Item<*>>): DiffResult {
+            return DiffResult(previousItems, emptyList(), null)
         }
 
         fun diff(
-            previousModels: List<ListModel<*>>,
-            newModels: List<ListModel<*>>,
+            previousItems: List<Item<*>>,
+            newItems: List<Item<*>>,
             differResult: DiffUtil.DiffResult
         ): DiffResult {
-            return DiffResult(previousModels, newModels, differResult)
+            return DiffResult(previousItems, newItems, differResult)
         }
     }
 }

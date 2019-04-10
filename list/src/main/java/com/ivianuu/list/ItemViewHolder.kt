@@ -20,41 +20,41 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 /**
- * View holder used in [ModelAdapter]s
+ * View holder used in [ItemAdapter]s
  */
-class ModelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     /**
-     * The current bound model if any
+     * The current bound item if any
      */
-    var model: ListModel<ModelHolder>? = null
+    var item: Item<Holder>? = null
         private set
 
     /**
-     * The underlying model holder
+     * The underlying item holder
      */
-    lateinit var holder: ModelHolder
+    lateinit var holder: Holder
         private set
 
-    internal fun bind(model: ListModel<*>) {
-        this.model = model as ListModel<ModelHolder>
+    internal fun bind(item: Item<*>) {
+        this.item = item as Item<Holder>
 
         if (!this::holder.isInitialized) {
-            holder = model.newHolder()
+            holder = item.newHolder()
             holder.setView(itemView)
         }
 
-        model.bindHolder(holder)
+        item.bindHolder(holder)
     }
 
     internal fun unbind() {
-        model?.unbindHolder(holder)
-        model = null
+        item?.unbindHolder(holder)
+        item = null
     }
 
 }
 
 /**
- * Returns the currently bound model or throws
+ * Returns the currently bound item or throws
  */
-fun ModelViewHolder.requireModel(): ListModel<ModelHolder> = model ?: error("model is null")
+fun ItemViewHolder.requireItem(): Item<Holder> = item ?: error("item is null")

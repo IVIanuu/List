@@ -5,62 +5,62 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ivianuu.list.addModelListener
-import com.ivianuu.list.common.ModelTouchHelper
-import com.ivianuu.list.common.modelController
+import com.ivianuu.list.addItemListener
+import com.ivianuu.list.common.ItemTouchHelper
+import com.ivianuu.list.common.itemController
 import com.ivianuu.list.common.onClick
 import kotlinx.android.synthetic.main.activity_main.list
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val models = mutableListOf<String>()
+    private val items = mutableListOf<String>()
 
-    private var countModelCount = 0
+    private var countItemCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        models.addAll((1..100).map { "Title: $it" })
+        items.addAll((1..100).map { "Title: $it" })
 
         list.layoutManager = LinearLayoutManager(this)
 
-        val controller = modelController {
-            ButtonModel {
+        val controller = itemController {
+            ButtonItem {
                 buttonText = "Shuffle"
                 onClick(R.id.button) { _, _ ->
-                    models.shuffle()
-                    requestModelBuild()
+                    items.shuffle()
+                    requestItemBuild()
                 }
             }
 
-            CountModel {
-                count = countModelCount
+            CountItem {
+                count = countItemCount
                 onClick(R.id.inc_button) { _, _ ->
-                    countModelCount++
-                    requestModelBuild()
+                    countItemCount++
+                    requestItemBuild()
                 }
                 onClick(R.id.dec_button) { _, _ ->
-                    countModelCount--
-                    requestModelBuild()
+                    countItemCount--
+                    requestItemBuild()
                 }
             }
 
-            ButtonModel {
+            ButtonItem {
                 buttonText = "Add Random"
                 onClick(R.id.button) { _, _ ->
-                    models.add(0, "Random ${UUID.randomUUID()}")
-                    requestModelBuild()
+                    items.add(0, "Random ${UUID.randomUUID()}")
+                    requestItemBuild()
                 }
             }
 
-            models.forEach {
-                SimpleModel {
+            items.forEach {
+                SimpleItem {
                     text = it
                     onClick { _, _ ->
                         Toast.makeText(
-                            this@MainActivity, "Clicked model at $it",
+                            this@MainActivity, "Clicked item at $it",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -68,53 +68,53 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        controller.adapter.addModelListener(
-            preBind = { model, holder ->
-                println("pre bind $model $holder view type is ${model.viewType}")
+        controller.adapter.addItemListener(
+            preBind = { item, holder ->
+                println("pre bind $item $holder view type is ${item.viewType}")
             },
-            postUnbind = { model, holder ->
-                println("post unbind $model $holder view type is ${model.viewType}")
+            postUnbind = { item, holder ->
+                println("post unbind $item $holder view type is ${item.viewType}")
             }
         )
 
         list.adapter = controller.adapter
 
-        ModelTouchHelper.dragging(list)
+        ItemTouchHelper.dragging(list)
             .vertical()
-            .target(SimpleModel::class)
+            .target(SimpleItem::class)
             .callbacks(
-                object : ModelTouchHelper.DragCallbacks<SimpleModel>() {
-                    override fun onModelMoved(
+                object : ItemTouchHelper.DragCallbacks<SimpleItem>() {
+                    override fun onItemMoved(
                         fromPosition: Int,
                         toPosition: Int,
-                        modelBeingMoved: SimpleModel,
+                        itemBeingMoved: SimpleItem,
                         itemView: View
                     ) {
-                        super.onModelMoved(fromPosition, toPosition, modelBeingMoved, itemView)
-                        Collections.swap(models, fromPosition - 3, toPosition - 3)
-                        controller.requestModelBuild()
+                        super.onItemMoved(fromPosition, toPosition, itemBeingMoved, itemView)
+                        Collections.swap(items, fromPosition - 3, toPosition - 3)
+                        controller.requestItemBuild()
                     }
                 }
             )
 
-        ModelTouchHelper.swiping(list)
+        ItemTouchHelper.swiping(list)
             .leftAndRight()
-            .target(SimpleModel::class)
+            .target(SimpleItem::class)
             .callbacks(
-                object : ModelTouchHelper.SwipeCallbacks<SimpleModel>() {
+                object : ItemTouchHelper.SwipeCallbacks<SimpleItem>() {
                     override fun onSwipeCompleted(
-                        model: SimpleModel,
+                        item: SimpleItem,
                         itemView: View,
                         position: Int,
                         direction: Int
                     ) {
-                        super.onSwipeCompleted(model, itemView, position, direction)
-                        models.removeAt(position - 3)
-                        controller.requestModelBuild()
+                        super.onSwipeCompleted(item, itemView, position, direction)
+                        items.removeAt(position - 3)
+                        controller.requestItemBuild()
                     }
                 }
             )
 
-        controller.requestModelBuild()
+        controller.requestItemBuild()
     }
 }

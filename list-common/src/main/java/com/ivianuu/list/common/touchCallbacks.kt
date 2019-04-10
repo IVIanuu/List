@@ -18,39 +18,39 @@ package com.ivianuu.list.common
 
 import android.graphics.Canvas
 import android.view.View
-import com.ivianuu.list.ListModel
+import com.ivianuu.list.Item
 
-interface BaseModelTouchCallback<T : ListModel<*>> {
+interface BaseItemTouchCallback<T : Item<*>> {
 
-    fun getMovementFlagsForModel(model: T, adapterPosition: Int): Int
+    fun getMovementFlagsForItem(item: T, adapterPosition: Int): Int
 
-    fun clearModelView(model: T, itemView: View)
-
-}
-
-interface ModelDragCallback<T : ListModel<*>> : BaseModelTouchCallback<T> {
-
-    fun onDragStarted(model: T, itemView: View, adapterPosition: Int)
-
-    fun onModelMoved(fromPosition: Int, toPosition: Int, modelBeingMoved: T, itemView: View)
-
-    fun onDragReleased(model: T, itemView: View)
+    fun clearItemView(item: T, itemView: View)
 
 }
 
-interface ModelSwipeCallback<T : ListModel<*>> : BaseModelTouchCallback<T> {
+interface ItemDragCallback<T : Item<*>> : BaseItemTouchCallback<T> {
 
-    fun onSwipeStarted(model: T, itemView: View, adapterPosition: Int)
+    fun onDragStarted(item: T, itemView: View, adapterPosition: Int)
+
+    fun onItemMoved(fromPosition: Int, toPosition: Int, itemBeingMoved: T, itemView: View)
+
+    fun onDragReleased(item: T, itemView: View)
+
+}
+
+interface ItemSwipeCallback<T : Item<*>> : BaseItemTouchCallback<T> {
+
+    fun onSwipeStarted(item: T, itemView: View, adapterPosition: Int)
 
     fun onSwipeProgressChanged(
-        model: T,
+        item: T,
         itemView: View,
         swipeProgress: Float,
         canvas: Canvas
     )
 
-    fun onSwipeReleased(model: T, itemView: View)
+    fun onSwipeReleased(item: T, itemView: View)
 
-    fun onSwipeCompleted(model: T, itemView: View, position: Int, direction: Int)
+    fun onSwipeCompleted(item: T, itemView: View, position: Int, direction: Int)
 }
 

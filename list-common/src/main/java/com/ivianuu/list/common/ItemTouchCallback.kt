@@ -20,32 +20,28 @@ import android.graphics.Canvas
 import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.ivianuu.list.ListModel
-import com.ivianuu.list.ModelAdapter
-import com.ivianuu.list.ModelViewHolder
-import com.ivianuu.list.moveModel
-import com.ivianuu.list.requireModel
+import com.ivianuu.list.*
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
-abstract class ModelTouchCallback<T : ListModel<*>>(
-    private val targetModelClass: KClass<T>? = null
-) : ItemTouchHelper.Callback(), ModelDragCallback<T>,
-    ModelSwipeCallback<T> {
+abstract class ItemTouchCallback<T : Item<*>>(
+    private val targetItemClass: KClass<T>? = null
+) : ItemTouchHelper.Callback(), ItemDragCallback<T>,
+    ItemSwipeCallback<T> {
 
-    private var holderBeingDragged: ModelViewHolder? = null
-    private var holderBeingSwiped: ModelViewHolder? = null
+    private var holderBeingDragged: ItemViewHolder? = null
+    private var holderBeingSwiped: ItemViewHolder? = null
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
     ): Int {
-        viewHolder as ModelViewHolder
+        viewHolder as ItemViewHolder
 
-        val model = viewHolder.requireModel()
+        val item = viewHolder.requireItem()
 
         // If multiple touch callbacks are registered on the recyclerview (to support combinations of
         // dragging and dropping) then we won't want to enable anything if another
@@ -54,8 +50,8 @@ abstract class ModelTouchCallback<T : ListModel<*>>(
                 && holderBeingSwiped == null
                 && recyclerView.hasSelection
 
-        return if (!isOtherCallbackActive && isTouchableModel(model)) {
-            getMovementFlagsForModel(model as T, viewHolder.adapterPosition)
+        return if (!isOtherCallbackActive && isTouchableItem(item)) {
+            getMovementFlagsForItem(item as T, viewHolder.adapterPosition)
         } else {
             0
         }
@@ -66,76 +62,76 @@ abstract class ModelTouchCallback<T : ListModel<*>>(
         current: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        current as ModelViewHolder
-        target as ModelViewHolder
+        current as ItemViewHolder
+        target as ItemViewHolder
 
-        // By default we don't allow dropping on a model that isn't a drag target
-        return isTouchableModel(target.requireModel())
+        // By default we don't allow dropping on a item that isn't a drag target
+        return isTouchableItem(target.requireItem())
     }
 
-    protected open fun isTouchableModel(model: ListModel<*>): Boolean =
-        targetModelClass?.java?.isInstance(model) ?: false
+    protected open fun isTouchableItem(item: Item<*>): Boolean =
+        targetItemClass?.java?.isInstance(item) ?: false
 
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        viewHolder as ModelViewHolder
+        viewHolder as ItemViewHolder
 
         val fromPosition = viewHolder.adapterPosition
         val toPosition = target.adapterPosition
-        (recyclerView.adapter as ModelAdapter).moveModel(fromPosition, toPosition)
+        (recyclerView.adapter as ItemAdapter).moveItem(fromPosition, toPosition)
 
-        val model = viewHolder.requireModel()
-        check(isTouchableModel(model)) {
-            "A model was dragged that is not a valid target: ${model.javaClass}"
+        val item = viewHolder.requireItem()
+        check(isTouchableItem(item)) {
+            "A item was dragged that is not a valid target: ${item.javaClass}"
         }
 
-        onModelMoved(fromPosition, toPosition, model as T, viewHolder.itemView)
+        onItemMoved(fromPosition, toPosition, item as T, viewHolder.itemView)
         return true
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        viewHolder as ModelViewHolder
+        viewHolder as ItemViewHolder
 
-        val model = viewHolder.requireModel()
+        val item = viewHolder.requireItem()
         val view = viewHolder.itemView
         val position = viewHolder.adapterPosition
 
-        check(isTouchableModel(model)) {
-            "A model was swiped that is not a valid target: ${model.javaClass}"
+        check(isTouchableItem(item)) {
+            "A item was swiped that is not a valid target: ${item.javaClass}"
         }
 
-        onSwipeCompleted(model as T, view, position, direction)
+        onSwipeCompleted(item as T, view, position, direction)
     }
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         super.onSelectedChanged(viewHolder, actionState)
 
         if (viewHolder != null) {
-            viewHolder as ModelViewHolder
+            viewHolder as ItemViewHolder
 
-            val model = viewHolder.requireModel()
+            val item = viewHolder.requireItem()
 
-            check(isTouchableModel(model)) {
-                "A model was selected that is not a valid target: ${model.javaClass}"
+            check(isTouchableItem(item)) {
+                "A item was selected that is not a valid target: ${item.javaClass}"
             }
 
             (viewHolder.itemView.parent as RecyclerView).hasSelection = true
 
             if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
                 holderBeingSwiped = viewHolder
-                onSwipeStarted(model as T, viewHolder.itemView, viewHolder.adapterPosition)
+                onSwipeStarted(item as T, viewHolder.itemView, viewHolder.adapterPosition)
             } else if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
                 holderBeingDragged = viewHolder
-                onDragStarted(model as T, viewHolder.itemView, viewHolder.adapterPosition)
+                onDragStarted(item as T, viewHolder.itemView, viewHolder.adapterPosition)
             }
         } else if (holderBeingDragged != null) {
-            onDragReleased(holderBeingDragged!!.model as T, holderBeingDragged!!.itemView)
+            onDragReleased(holderBeingDragged!!.item as T, holderBeingDragged!!.itemView)
             holderBeingDragged = null
         } else if (holderBeingSwiped != null) {
-            onSwipeReleased(holderBeingSwiped!!.model as T, holderBeingSwiped!!.itemView)
+            onSwipeReleased(holderBeingSwiped!!.item as T, holderBeingSwiped!!.itemView)
             holderBeingSwiped = null
         }
     }
@@ -149,9 +145,9 @@ abstract class ModelTouchCallback<T : ListModel<*>>(
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
 
-        viewHolder as ModelViewHolder
+        viewHolder as ItemViewHolder
 
-        clearModelView(viewHolder.model as T, viewHolder.itemView)
+        clearItemView(viewHolder.item as T, viewHolder.itemView)
 
         // If multiple touch helpers are in use, one touch helper can pick up buffered touch inputs
         // immediately after another touch event finishes. This leads to things like a view being
@@ -175,11 +171,11 @@ abstract class ModelTouchCallback<T : ListModel<*>>(
     ) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
 
-        viewHolder as ModelViewHolder
+        viewHolder as ItemViewHolder
 
-        val model = viewHolder.requireModel()
-        check(isTouchableModel(model)) {
-            "A model was selected that is not a valid target: ${model.javaClass}"
+        val item = viewHolder.requireItem()
+        check(isTouchableItem(item)) {
+            "A item was selected that is not a valid target: ${item.javaClass}"
         }
 
         val itemView = viewHolder.itemView
@@ -193,41 +189,41 @@ abstract class ModelTouchCallback<T : ListModel<*>>(
         // Clamp to 1/-1 in the case of side padding where the view can be swiped extra
         val clampedProgress = max(-1f, min(1f, swipeProgress))
 
-        onSwipeProgressChanged(model as T, itemView, clampedProgress, c)
+        onSwipeProgressChanged(item as T, itemView, clampedProgress, c)
     }
 
-    override fun clearModelView(model: T, itemView: View) {
+    override fun clearItemView(item: T, itemView: View) {
     }
 
-    override fun onDragStarted(model: T, itemView: View, adapterPosition: Int) {
+    override fun onDragStarted(item: T, itemView: View, adapterPosition: Int) {
     }
 
-    override fun onModelMoved(
+    override fun onItemMoved(
         fromPosition: Int,
         toPosition: Int,
-        modelBeingMoved: T,
+        itemBeingMoved: T,
         itemView: View
     ) {
     }
 
-    override fun onDragReleased(model: T, itemView: View) {
+    override fun onDragReleased(item: T, itemView: View) {
     }
 
-    override fun onSwipeStarted(model: T, itemView: View, adapterPosition: Int) {
+    override fun onSwipeStarted(item: T, itemView: View, adapterPosition: Int) {
     }
 
     override fun onSwipeProgressChanged(
-        model: T,
+        item: T,
         itemView: View,
         swipeProgress: Float,
         canvas: Canvas
     ) {
     }
 
-    override fun onSwipeReleased(model: T, itemView: View) {
+    override fun onSwipeReleased(item: T, itemView: View) {
     }
 
-    override fun onSwipeCompleted(model: T, itemView: View, position: Int, direction: Int) {
+    override fun onSwipeCompleted(item: T, itemView: View, position: Int, direction: Int) {
     }
 
     companion object {

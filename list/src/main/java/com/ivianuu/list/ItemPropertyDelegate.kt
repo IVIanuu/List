@@ -20,25 +20,25 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 /**
- * Delegate which will be used to read and write [ModelProperties] in [ListModel]s
+ * Delegate which will be used to read and write [ItemProperties] in [Item]s
  */
-class ModelPropertyDelegate<T>(
-    private val properties: ModelProperties,
+class ItemPropertyDelegate<T>(
+    private val properties: ItemProperties,
     internal val key: String,
     private val doHash: Boolean = true,
     private val onPropertySet: ((T) -> Unit)? = null,
     private val defaultValue: () -> T
-) : ReadWriteProperty<ListModel<*>, T> {
+) : ReadWriteProperty<Item<*>, T> {
 
     init {
         properties.registerDelegate(this)
     }
 
-    override fun getValue(thisRef: ListModel<*>, property: KProperty<*>): T {
+    override fun getValue(thisRef: Item<*>, property: KProperty<*>): T {
         return getValueInternal()
     }
 
-    override fun setValue(thisRef: ListModel<*>, property: KProperty<*>, value: T) {
+    override fun setValue(thisRef: Item<*>, property: KProperty<*>, value: T) {
         properties.setProperty(key, value, doHash)
         onPropertySet?.invoke(value)
     }
@@ -51,7 +51,7 @@ class ModelPropertyDelegate<T>(
         var property = properties.getPropertyEntry<T>(key)
 
         if (property == null) {
-            property = ModelProperty(
+            property = ItemProperty(
                 key,
                 defaultValue(),
                 doHash

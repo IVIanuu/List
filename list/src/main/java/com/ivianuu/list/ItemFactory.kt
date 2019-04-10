@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package com.ivianuu.list.common
-
-import com.ivianuu.list.ModelController
+package com.ivianuu.list
 
 /**
- * Simple [ModelController] which takes invokes [buildModels] to build models
+ * @author Manuel Wrage (IVIanuu)
  */
-class SimpleModelController(
-    private val buildModels: ModelController.() -> Unit
-) : ModelController() {
-    override fun buildModels() {
-        buildModels.invoke(this)
-    }
+abstract class ItemFactory<T : Item<*>>(
+    private val factory: () -> T
+) {
+    fun create(): T = factory()
 }
-
-/**
- * Returns a [SimpleModelController] which uses [buildModels] to build it's models
- */
-fun modelController(buildModels: ModelController.() -> Unit): SimpleModelController =
-    SimpleModelController(buildModels = buildModels)

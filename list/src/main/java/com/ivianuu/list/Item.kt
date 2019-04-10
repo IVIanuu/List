@@ -22,41 +22,41 @@ import android.view.ViewGroup
 import com.ivianuu.closeable.Closeable
 
 /**
- * Single item in a [ModelAdapter]
+ * Single item in a [ItemAdapter]
  */
-abstract class ListModel<H : ModelHolder>(
+abstract class Item<H : Holder>(
     id: Any? = null,
     layoutRes: Int = -1
 ) {
 
     /**
-     * The unique id of this model
+     * The unique id of this item
      */
     var id: Long = -1
         internal set(value) {
-            check(!addedToAdapter) { "cannot change the id model after being added to an adapter" }
+            check(!addedToAdapter) { "cannot change the id item after being added to an adapter" }
             field = value
         }
 
     /**
-     * The view type of this model
+     * The view type of this item
      */
     open val viewType: Int get() = layoutRes
 
     /**
-     * The layout res of this model which will be in [buildView] if not overridden
+     * The layout res of this item which will be in [buildView] if not overridden
      */
     open val layoutRes = layoutRes
 
     /**
-     * All properties of this model which will be used to produce a correct [equals] and [hashCode]
+     * All properties of this item which will be used to produce a correct [equals] and [hashCode]
      */
-    val properties = ModelProperties()
+    val properties = ItemProperties()
 
-    private val listeners = mutableSetOf<ListModelListener>()
+    private val listeners = mutableSetOf<ItemListener>()
     private var superCalled = false
 
-    private lateinit var adapter: ModelAdapter
+    private lateinit var adapter: ItemAdapter
     private var addedToAdapter = false
 
     init {
@@ -69,7 +69,7 @@ abstract class ListModel<H : ModelHolder>(
     protected abstract fun createHolder(): H
 
     /**
-     * Will be called when a view for model should be created
+     * Will be called when a view for item should be created
      */
     protected open fun buildView(parent: ViewGroup): View {
         check(layoutRes != -1) { "specify a layoutRes or override buildView" }
@@ -77,7 +77,7 @@ abstract class ListModel<H : ModelHolder>(
     }
 
     /**
-     * Should bindHolder the data of this model to the [holder]
+     * Should bindHolder the data of this item to the [holder]
      */
     protected open fun bind(holder: H) {
         superCalled = true
@@ -91,13 +91,13 @@ abstract class ListModel<H : ModelHolder>(
     }
 
     /**
-     * Registers a required property which is also the id of this model
+     * Registers a required property which is also the id of this item
      */
     protected fun <T> idProperty(
         key: String,
         onPropertySet: ((T) -> Unit)? = null
-    ): ModelPropertyDelegate<T> =
-        ModelPropertyDelegate(properties, key, true, {
+    ): ItemPropertyDelegate<T> =
+        ItemPropertyDelegate(properties, key, true, {
             id(it)
             onPropertySet?.invoke(it)
         }) {
@@ -112,8 +112,8 @@ abstract class ListModel<H : ModelHolder>(
         doHash: Boolean = true,
         onPropertySet: ((T) -> Unit)? = null,
         defaultValue: () -> T
-    ): ModelPropertyDelegate<T> =
-        ModelPropertyDelegate(properties, key, doHash, onPropertySet, defaultValue)
+    ): ItemPropertyDelegate<T> =
+        ItemPropertyDelegate(properties, key, doHash, onPropertySet, defaultValue)
 
     /**
      * Registers a non null property
@@ -122,7 +122,7 @@ abstract class ListModel<H : ModelHolder>(
         key: String,
         doHash: Boolean = true,
         onPropertySet: ((T) -> Unit)? = null
-    ): ModelPropertyDelegate<T> = ModelPropertyDelegate(properties, key, doHash, onPropertySet) {
+    ): ItemPropertyDelegate<T> = ItemPropertyDelegate(properties, key, doHash, onPropertySet) {
         error("missing property with key '$key' use optionalProperty() for optional ones")
     }
 
@@ -133,13 +133,13 @@ abstract class ListModel<H : ModelHolder>(
         key: String,
         doHash: Boolean = true,
         onPropertySet: ((T?) -> Unit)? = null
-    ): ModelPropertyDelegate<T?> =
-        ModelPropertyDelegate(properties, key, doHash, onPropertySet) { null }
+    ): ItemPropertyDelegate<T?> =
+        ItemPropertyDelegate(properties, key, doHash, onPropertySet) { null }
 
     /**
      * Adds the [listener]
      */
-    fun addListener(listener: ListModelListener): Closeable {
+    fun addListener(listener: ItemListener): Closeable {
         listeners.add(listener)
         return Closeable { removeListener(listener) }
     }
@@ -147,7 +147,7 @@ abstract class ListModel<H : ModelHolder>(
     /**
      * Removes the previously added [listener]
      */
-    fun removeListener(listener: ListModelListener) {
+    fun removeListener(listener: ItemListener) {
         listeners.remove(listener)
     }
 
@@ -175,7 +175,7 @@ abstract class ListModel<H : ModelHolder>(
         notifyListeners { it.postUnbind(this, holder) }
     }
 
-    internal fun addedToAdapter(adapter: ModelAdapter) {
+    internal fun addedToAdapter(adapter: ItemAdapter) {
         if (addedToAdapter && this.adapter == adapter) return
 
         check(id != 0L) { "id must be set" }
@@ -186,11 +186,11 @@ abstract class ListModel<H : ModelHolder>(
 
         this.adapter = adapter
         addedToAdapter = true
-        properties.modelAdded()
+        properties.itemAdded()
     }
 
-    private inline fun notifyListeners(block: (ListModelListener) -> Unit) {
-        (adapter.modelListeners + listeners.toList()).forEach(block)
+    private inline fun notifyListeners(block: (ItemListener) -> Unit) {
+        (adapter.itemListeners + listeners.toList()).forEach(block)
     }
 
     private inline fun requireSuperCalled(block: () -> Unit) {
@@ -201,7 +201,7 @@ abstract class ListModel<H : ModelHolder>(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is ListModel<*>) return false
+        if (other !is Item<*>) return false
 
         if (id != other.id) return false
         if (viewType != other.viewType) return false
@@ -226,16 +226,16 @@ abstract class ListModel<H : ModelHolder>(
     }
 }
 
-/** Calls trough [ModelProperties.getProperty] */
-fun <T> ListModel<*>.getProperty(key: String): T? =
+/** Calls trough [ItemProperties.getProperty] */
+fun <T> Item<*>.getProperty(key: String): T? =
     properties.getProperty(key)
 
-/** Calls trough [ModelProperties.requireProperty] */
-fun <T> ListModel<*>.requireProperty(key: String): T =
+/** Calls trough [ItemProperties.requireProperty] */
+fun <T> Item<*>.requireProperty(key: String): T =
     properties.requireProperty(key)
 
-/** Calls trough [ModelProperties.setProperty] */
-fun <T> ListModel<*>.setProperty(
+/** Calls trough [ItemProperties.setProperty] */
+fun <T> Item<*>.setProperty(
     key: String,
     value: T,
     doHash: Boolean = true
@@ -244,16 +244,16 @@ fun <T> ListModel<*>.setProperty(
 }
 
 /**
- * Sets the hashed version of [id] as the model id
+ * Sets the hashed version of [id] as the item id
  */
-fun ListModel<*>.id(id: Any?) {
+fun Item<*>.id(id: Any?) {
     this.id = id?.hashCode()?.toLong() ?: 0
 }
 
 /**
- * Adds this model to the [controller]
+ * Adds this item to the [controller]
  */
-fun <T : ListModel<*>> T.addTo(controller: ModelController): T {
+fun <T : Item<*>> T.addTo(controller: ItemController): T {
     controller.add(this)
     return this
 }
