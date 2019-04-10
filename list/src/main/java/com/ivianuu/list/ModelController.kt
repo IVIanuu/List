@@ -142,6 +142,9 @@ abstract class ModelController {
     inline fun <T : ListModel<*>> T.add(body: T.() -> Unit): T =
         apply(body).addTo(this@ModelController)
 
+    inline fun <T : ListModel<*>> T.addIt(body: (T) -> Unit): T =
+        apply(body).addTo(this@ModelController)
+
     private enum class RequestedModelBuildType {
         NONE, NEXT_FRAME, DELAYED
     }
