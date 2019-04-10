@@ -93,8 +93,14 @@ abstract class ListModel<H : ModelHolder>(
     /**
      * Registers a required property which is also the id of this model
      */
-    protected fun <T> idProperty(key: String): ModelPropertyDelegate<T> =
-        ModelPropertyDelegate<T>(properties, key, true, this::id) {
+    protected fun <T> idProperty(
+        key: String,
+        onPropertySet: ((T) -> Unit)? = null
+    ): ModelPropertyDelegate<T> =
+        ModelPropertyDelegate(properties, key, true, {
+            id(it)
+            onPropertySet?.invoke(it)
+        }) {
             error("missing property with key '$key' use optionalProperty() for optional ones")
         }
 
@@ -104,16 +110,19 @@ abstract class ListModel<H : ModelHolder>(
     protected fun <T> property(
         key: String,
         doHash: Boolean = true,
+        onPropertySet: ((T) -> Unit)? = null,
         defaultValue: () -> T
-    ): ModelPropertyDelegate<T> = ModelPropertyDelegate(properties, key, doHash, null, defaultValue)
+    ): ModelPropertyDelegate<T> =
+        ModelPropertyDelegate(properties, key, doHash, onPropertySet, defaultValue)
 
     /**
      * Registers a non null property
      */
     protected fun <T> requiredProperty(
         key: String,
-        doHash: Boolean = true
-    ): ModelPropertyDelegate<T> = ModelPropertyDelegate(properties, key, doHash) {
+        doHash: Boolean = true,
+        onPropertySet: ((T) -> Unit)? = null
+    ): ModelPropertyDelegate<T> = ModelPropertyDelegate(properties, key, doHash, onPropertySet) {
         error("missing property with key '$key' use optionalProperty() for optional ones")
     }
 
@@ -122,9 +131,10 @@ abstract class ListModel<H : ModelHolder>(
      */
     protected fun <T> optionalProperty(
         key: String,
-        doHash: Boolean = true
+        doHash: Boolean = true,
+        onPropertySet: ((T?) -> Unit)? = null
     ): ModelPropertyDelegate<T?> =
-        ModelPropertyDelegate(properties, key, doHash) { null }
+        ModelPropertyDelegate(properties, key, doHash, onPropertySet) { null }
 
     /**
      * Adds the [listener]
