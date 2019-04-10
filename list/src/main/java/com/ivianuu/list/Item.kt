@@ -94,24 +94,24 @@ abstract class Item<H : Holder>(
      * Registers a required property which is also the id of this item
      */
     protected fun <T> idProperty(
-        key: String,
+        key: String = USE_PROPERTY_NAME,
         onPropertySet: ((T) -> Unit)? = null
     ): ItemPropertyDelegate<T> =
         ItemPropertyDelegate(properties, key, true, {
             id(it)
             onPropertySet?.invoke(it)
         }) {
-            error("missing property with key '$key' use optionalProperty() for optional ones")
+            error("missing property with key '${it.realKey}' use optionalProperty() for optional ones")
         }
 
     /**
      * Registers a property
      */
     protected fun <T> property(
-        key: String,
+        key: String = USE_PROPERTY_NAME,
         doHash: Boolean = true,
         onPropertySet: ((T) -> Unit)? = null,
-        defaultValue: () -> T
+        defaultValue: (ItemPropertyDelegate<T>) -> T
     ): ItemPropertyDelegate<T> =
         ItemPropertyDelegate(properties, key, doHash, onPropertySet, defaultValue)
 
@@ -119,18 +119,18 @@ abstract class Item<H : Holder>(
      * Registers a non null property
      */
     protected fun <T> requiredProperty(
-        key: String,
+        key: String = USE_PROPERTY_NAME,
         doHash: Boolean = true,
         onPropertySet: ((T) -> Unit)? = null
     ): ItemPropertyDelegate<T> = ItemPropertyDelegate(properties, key, doHash, onPropertySet) {
-        error("missing property with key '$key' use optionalProperty() for optional ones")
+        error("missing property with key '${it.realKey}' use optionalProperty() for optional ones")
     }
 
     /**
      * Registers a nullable property
      */
     protected fun <T> optionalProperty(
-        key: String,
+        key: String = USE_PROPERTY_NAME,
         doHash: Boolean = true,
         onPropertySet: ((T?) -> Unit)? = null
     ): ItemPropertyDelegate<T?> =

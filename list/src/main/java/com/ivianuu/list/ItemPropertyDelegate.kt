@@ -19,48 +19,55 @@ package com.ivianuu.list
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+const val USE_PROPERTY_NAME = "ItemPropertyDelegate.usePropertyName"
+
 /**
  * Delegate which will be used to read and write [ItemProperties] in [Item]s
  */
 class ItemPropertyDelegate<T>(
     private val properties: ItemProperties,
-    internal val key: String,
+    private val key: String,
     private val doHash: Boolean = true,
     private val onPropertySet: ((T) -> Unit)? = null,
-    private val defaultValue: () -> T
+    private val defaultValue: (ItemPropertyDelegate<T>) -> T
 ) : ReadWriteProperty<Item<*>, T> {
 
-    init {
-        properties.registerDelegate(this)
-    }
+    lateinit var realKey: String
 
     override fun getValue(thisRef: Item<*>, property: KProperty<*>): T {
-        return getValueInternal()
-    }
+        initRealKeyIfNeeded(thisRef, property)
 
-    override fun setValue(thisRef: Item<*>, property: KProperty<*>, value: T) {
-        properties.setProperty(key, value, doHash)
-        onPropertySet?.invoke(value)
-    }
+        var prop = properties.getPropertyEntry<T>(realKey)
 
-    internal fun initializeValue() {
-        getValueInternal()
-    }
-
-    private fun getValueInternal(): T {
-        var property = properties.getPropertyEntry<T>(key)
-
-        if (property == null) {
-            property = ItemProperty(
-                key,
-                defaultValue(),
+        if (prop == null) {
+            prop = ItemProperty(
+                realKey,
+                defaultValue(this),
                 doHash
             )
 
-            properties.setProperty(property)
-            onPropertySet?.invoke(property.value)
+            properties.setProperty(prop)
+            onPropertySet?.invoke(prop.value)
         }
 
-        return property.value
+        return prop.value
     }
+
+    override fun setValue(thisRef: Item<*>, property: KProperty<*>, value: T) {
+        initRealKeyIfNeeded(thisRef, property)
+        properties.setProperty(realKey, value, doHash)
+        onPropertySet?.invoke(value)
+    }
+
+    private fun initRealKeyIfNeeded(thisRef: Item<*>, property: KProperty<*>) {
+        if (!this::realKey.isInitialized) {
+            realKey = if (key == USE_PROPERTY_NAME) {
+                "${thisRef::class.java.simpleName}.${property.name}"
+            } else {
+                key
+            }
+        }
+
+    }
+
 }

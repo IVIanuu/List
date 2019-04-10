@@ -45,25 +45,6 @@ class ItemPropertiesTest {
     }
 
     @Test
-    fun testInitializeValuesOnItemAdded() {
-        var initialized = false
-        ItemPropertyDelegate(properties, "key") {
-            initialized = true
-            "value"
-        }
-
-        properties.itemAdded()
-
-        assertTrue(initialized)
-    }
-
-    @Test
-    fun testAccessUninitializedValueBeforeItemAdded() {
-        ItemPropertyDelegate(properties, "key") { "value" }
-        assertEquals("value", properties.getProperty<String>("key"))
-    }
-
-    @Test
     fun testDoNotAllowMutationAfterItemBeingAdded() {
         properties.itemAdded()
         val throwed = try {

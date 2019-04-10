@@ -29,18 +29,10 @@ class ItemProperties internal constructor() {
 
     private var itemAdded = false
 
-    private val uninitializedDelegates =
-        mutableMapOf<String, ItemPropertyDelegate<*>>()
-
     /**
      * Returns the [ItemProperty] for the [key]
      */
     fun <T> getPropertyEntry(key: String): ItemProperty<T>? {
-        // try to initialize the value if not added yet
-        if (!itemAdded) {
-            uninitializedDelegates.remove(key)?.initializeValue()
-        }
-
         return _entries[key] as? ItemProperty<T>
     }
 
@@ -52,21 +44,10 @@ class ItemProperties internal constructor() {
     ) {
         check(!itemAdded) { "cannot change properties on added items" }
         _entries[property.key] = property
-        uninitializedDelegates.remove(property.key)
     }
 
     internal fun itemAdded() {
-        // force init the value of all delegates to have consistent equals() and hashCode() results
-        uninitializedDelegates.values.toList()
-            .forEach(ItemPropertyDelegate<*>::initializeValue)
-        uninitializedDelegates.clear()
-
         itemAdded = true
-    }
-
-    internal fun registerDelegate(delegate: ItemPropertyDelegate<*>) {
-        check(!itemAdded) { "cannot change properties on added items" }
-        uninitializedDelegates[delegate.key] = delegate
     }
 
     override fun equals(other: Any?): Boolean {
