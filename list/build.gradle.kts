@@ -29,9 +29,9 @@ android {
 }
 
 dependencies {
+    api(Deps.androidxRecyclerView)
     api(Deps.closeable)
     api(Deps.kotlinStdLib)
-    api(Deps.androidxRecyclerView)
     api(Deps.stdlibx)
 
     testImplementation(Deps.junit)
