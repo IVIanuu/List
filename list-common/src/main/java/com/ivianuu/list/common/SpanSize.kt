@@ -28,7 +28,7 @@ interface SpanSizeProvider {
     fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int
 }
 
-class ModelSpanSizeLookUp(
+class ModelSpanSizeLookup(
     private val adapter: ModelAdapter,
     private val layoutManager: GridLayoutManager
 ) : GridLayoutManager.SpanSizeLookup() {
