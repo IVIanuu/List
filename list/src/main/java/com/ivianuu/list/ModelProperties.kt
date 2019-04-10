@@ -16,9 +16,6 @@
 
 package com.ivianuu.list
 
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
-
 /**
  * Properties of a [ListModel]
  */
@@ -139,49 +136,3 @@ data class ModelProperty<T>(
     val value: T,
     val doHash: Boolean = true
 )
-
-/**
- * Delegate which will be used to read and write [ModelProperties] in [ListModel]s
- */
-class ModelPropertyDelegate<T>(
-    private val properties: ModelProperties,
-    internal val key: String,
-    private val doHash: Boolean = true,
-    private val onPropertySet: ((T) -> Unit)? = null,
-    private val defaultValue: () -> T
-) : ReadWriteProperty<ListModel<*>, T> {
-
-    init {
-        properties.registerDelegate(this)
-    }
-
-    override fun getValue(thisRef: ListModel<*>, property: KProperty<*>): T {
-        return getValueInternal()
-    }
-
-    override fun setValue(thisRef: ListModel<*>, property: KProperty<*>, value: T) {
-        properties.setProperty(key, value, doHash)
-        onPropertySet?.invoke(value)
-    }
-
-    internal fun initializeValue() {
-        getValueInternal()
-    }
-
-    private fun getValueInternal(): T {
-        var property = properties.getPropertyEntry<T>(key)
-
-        if (property == null) {
-            property = ModelProperty(
-                key,
-                defaultValue(),
-                doHash
-            )
-
-            properties.setProperty(property)
-            onPropertySet?.invoke(property.value)
-        }
-
-        return property.value
-    }
-}
