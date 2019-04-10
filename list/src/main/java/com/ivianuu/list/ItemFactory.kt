@@ -17,7 +17,7 @@
 package com.ivianuu.list
 
 /**
- * @author Manuel Wrage (IVIanuu)
+ * Factory for [Item]s
  */
 abstract class ItemFactory<T : Item<*>>(
     private val factory: () -> T
