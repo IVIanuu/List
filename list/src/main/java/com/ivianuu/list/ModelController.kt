@@ -98,23 +98,21 @@ abstract class ModelController {
     /**
      * Adds all [models]
      */
-    protected fun add(models: Iterable<ListModel<*>>) {
+    fun add(models: Iterable<ListModel<*>>) {
         models.forEach(this::add)
     }
 
     /**
      * Adds all [models]
      */
-    protected fun add(vararg models: ListModel<*>) {
+    fun add(vararg models: ListModel<*>) {
         models.forEach(this::add)
     }
 
-    @PublishedApi
-    internal fun addInternal(model: ListModel<*>) {
-        add(model)
-    }
-
-    private fun add(model: ListModel<*>) {
+    /**
+     * Adds the model
+     */
+    fun add(model: ListModel<*>) {
         check(isBuildingModels) { "cannot add models outside of buildModels()" }
         currentModels.add(model)
     }

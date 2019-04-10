@@ -236,6 +236,6 @@ fun ListModel<*>.id(id: Any?) {
  * Adds this model to the [controller]
  */
 fun <T : ListModel<*>> T.addTo(controller: ModelController): T {
-    controller.addInternal(this)
+    controller.add(this)
     return this
 }
