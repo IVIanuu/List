@@ -9,7 +9,6 @@ import com.ivianuu.list.addModelListener
 import com.ivianuu.list.common.ModelTouchHelper
 import com.ivianuu.list.common.modelController
 import com.ivianuu.list.common.onClick
-import com.ivianuu.list.id
 import kotlinx.android.synthetic.main.activity_main.list
 import java.util.*
 
@@ -29,7 +28,6 @@ class MainActivity : AppCompatActivity() {
 
         val controller = modelController {
             ButtonModel {
-                id("shuffle")
                 buttonText = "Shuffle"
                 onClick(R.id.button) { _, _ ->
                     models.shuffle()
@@ -38,7 +36,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             CountModel {
-                id("count")
                 count = countModelCount
                 onClick(R.id.inc_button) { _, _ ->
                     countModelCount++
@@ -51,7 +48,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             ButtonModel {
-                id("add_random")
                 buttonText = "Add Random"
                 onClick(R.id.button) { _, _ ->
                     models.add(0, "Random ${UUID.randomUUID()}")
@@ -61,7 +57,6 @@ class MainActivity : AppCompatActivity() {
 
             models.forEach {
                 SimpleModel {
-                    id(it)
                     text = it
                     onClick { _, _ ->
                         Toast.makeText(

@@ -24,7 +24,7 @@ import kotlinx.android.synthetic.main.item_count.count
 import kotlinx.android.synthetic.main.item_simple.title
 
 class ButtonModel : LayoutContainerModel(layoutRes = R.layout.item_button) {
-    var buttonText by requiredProperty<String>("buttonText")
+    var buttonText by idProperty<String>("buttonText")
 
     override fun bind(holder: LayoutContainerHolder) {
         super.bind(holder)
@@ -46,7 +46,7 @@ class CountModel : LayoutContainerModel(id = "count", layoutRes = R.layout.item_
 }
 
 class SimpleModel : LayoutContainerModel(layoutRes = R.layout.item_simple) {
-    var text by requiredProperty<String>("text")
+    var text by idProperty<String>("text")
 
     override fun bind(holder: LayoutContainerHolder) {
         super.bind(holder)

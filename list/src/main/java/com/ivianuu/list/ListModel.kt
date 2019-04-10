@@ -91,13 +91,21 @@ abstract class ListModel<H : ModelHolder>(
     }
 
     /**
+     * Registers a required property which is also the id of this model
+     */
+    protected fun <T> idProperty(key: String): ModelPropertyDelegate<T> =
+        ModelPropertyDelegate<T>(properties, key, true, this::id) {
+            error("missing property with key '$key' use optionalProperty() for optional ones")
+        }
+
+    /**
      * Registers a property
      */
     protected fun <T> property(
         key: String,
         doHash: Boolean = true,
         defaultValue: () -> T
-    ): ModelPropertyDelegate<T> = ModelPropertyDelegate(properties, key, doHash, defaultValue)
+    ): ModelPropertyDelegate<T> = ModelPropertyDelegate(properties, key, doHash, null, defaultValue)
 
     /**
      * Registers a non null property

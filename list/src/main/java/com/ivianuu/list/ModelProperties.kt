@@ -147,6 +147,7 @@ class ModelPropertyDelegate<T>(
     private val properties: ModelProperties,
     internal val key: String,
     private val doHash: Boolean = true,
+    private val onPropertySet: ((T) -> Unit)? = null,
     private val defaultValue: () -> T
 ) : ReadWriteProperty<ListModel<*>, T> {
 
@@ -160,6 +161,7 @@ class ModelPropertyDelegate<T>(
 
     override fun setValue(thisRef: ListModel<*>, property: KProperty<*>, value: T) {
         properties.setProperty(key, value, doHash)
+        onPropertySet?.invoke(value)
     }
 
     internal fun initializeValue() {
@@ -177,6 +179,7 @@ class ModelPropertyDelegate<T>(
             )
 
             properties.setProperty(property)
+            onPropertySet?.invoke(property.value)
         }
 
         return property.value
