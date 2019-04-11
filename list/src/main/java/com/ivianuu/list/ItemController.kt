@@ -99,14 +99,14 @@ abstract class ItemController {
      * Adds all [items]
      */
     fun add(items: Iterable<Item<*>>) {
-        items.forEach(this::add)
+        items.forEach { add(it) }
     }
 
     /**
      * Adds all [items]
      */
     fun add(vararg items: Item<*>) {
-        items.forEach(this::add)
+        items.forEach { add(it) }
     }
 
     /**

@@ -58,7 +58,7 @@ class ItemProperties internal constructor() {
     internal fun itemAdded() {
         // force init the value of all delegates to have consistent equals() and hashCode() results
         uninitializedDelegates.values.toList()
-            .forEach(ItemPropertyDelegate<*>::initializeValue)
+            .forEach { it.initializeValue() }
         uninitializedDelegates.clear()
 
         itemAdded = true
@@ -75,13 +75,13 @@ class ItemProperties internal constructor() {
 
         // get all hashable properties and compare them
         val entries = _entries
-            .filterValues(ItemProperty<*>::doHash)
-            .map(Map.Entry<String, ItemProperty<*>>::value)
-            .map(ItemProperty<*>::value)
+            .filterValues { it.doHash }
+            .map { it.value }
+            .map { it.value }
         val otherEntries = other._entries
-            .filterValues(ItemProperty<*>::doHash)
-            .map(Map.Entry<String, ItemProperty<*>>::value)
-            .map(ItemProperty<*>::value)
+            .filterValues { it.doHash }
+            .map { it.value }
+            .map { it.value }
         if (entries != otherEntries) return false
 
         return true
@@ -90,16 +90,16 @@ class ItemProperties internal constructor() {
     override fun hashCode(): Int {
         // filter out non hashable properties
         val entries = _entries
-            .filterValues(ItemProperty<*>::doHash)
-            .map(Map.Entry<String, ItemProperty<*>>::value)
-            .map(ItemProperty<*>::value)
+            .filterValues { it.doHash }
+            .map { it.value }
+            .map { it.value }
         return entries.hashCode()
     }
 
     override fun toString(): String {
         val entries = _entries
-            .map(Map.Entry<String, ItemProperty<*>>::value)
-            .associateBy(ItemProperty<*>::key)
+            .map { it.value }
+            .associateBy { it.key }
             .mapValues { it.value.value }
         return entries.toString()
     }

@@ -113,7 +113,7 @@ open class ItemAdapter : RecyclerView.Adapter<ItemViewHolder>() {
 
     private fun List<Item<*>>.checkDuplicates() {
         // check for duplicated ids
-        groupBy(Item<*>::id)
+        groupBy { it.id }
             .filterValues { it.size > 1 }
             .forEach {
                 error("Duplicated id ${it.value}")

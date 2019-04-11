@@ -74,7 +74,7 @@ fun Item<*>.addListener(
     onBuildView,
     preBind, postBind,
     preUnbind, postUnbind
-).let(this::addListener)
+).let { addListener(it) }
 
 fun ItemAdapter.addItemListener(
     onCreateHolder: ((item: Item<*>, holder: Holder) -> Unit)? = null,
@@ -88,7 +88,7 @@ fun ItemAdapter.addItemListener(
     onBuildView,
     preBind, postBind,
     preUnbind, postUnbind
-).let(this::addItemListener)
+).let { addItemListener(it) }
 
 fun ItemController.addItemListener(
     onCreateHolder: ((item: Item<*>, holder: Holder) -> Unit)? = null,
@@ -102,7 +102,7 @@ fun ItemController.addItemListener(
     onBuildView,
     preBind, postBind,
     preUnbind, postUnbind
-).let(this::addItemListener)
+).let { addItemListener(it) }
 
 fun ItemListener(
     onCreateHolder: ((item: Item<*>, holder: Holder) -> Unit)? = null,

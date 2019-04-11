@@ -77,7 +77,7 @@ abstract class Item<H : Holder>(
     }
 
     /**
-     * Should bindHolder the data of this item to the [holder]
+     * Should bind the data of this item to the [holder]
      */
     protected open fun bind(holder: H) {
         superCalled = true
