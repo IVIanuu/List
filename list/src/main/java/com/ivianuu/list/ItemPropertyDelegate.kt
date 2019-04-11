@@ -19,54 +19,48 @@ package com.ivianuu.list
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-const val USE_PROPERTY_NAME = "ItemPropertyDelegate.usePropertyName"
-
 /**
  * Delegate which will be used to read and write [ItemProperties] in [Item]s
  */
 class ItemPropertyDelegate<T>(
     private val properties: ItemProperties,
-    private val key: String,
+    internal val key: String,
     private val doHash: Boolean = true,
     private val onPropertySet: ((T) -> Unit)? = null,
-    private val defaultValue: (ItemPropertyDelegate<T>) -> T
+    private val defaultValue: () -> T
 ) : ReadWriteProperty<Item<*>, T> {
 
-    lateinit var realKey: String
+    init {
+        properties.registerDelegate(this)
+    }
 
     override fun getValue(thisRef: Item<*>, property: KProperty<*>): T {
-        initRealKeyIfNeeded(thisRef, property)
-
-        var prop = properties.getPropertyEntry<T>(realKey)
-
-        if (prop == null) {
-            prop = ItemProperty(
-                realKey,
-                defaultValue(this),
-                doHash
-            )
-
-            properties.setProperty(prop)
-            onPropertySet?.invoke(prop.value)
-        }
-
-        return prop.value
+        return getValueInternal()
     }
 
     override fun setValue(thisRef: Item<*>, property: KProperty<*>, value: T) {
-        initRealKeyIfNeeded(thisRef, property)
-        properties.setProperty(realKey, value, doHash)
+        properties.setProperty(key, value, doHash)
         onPropertySet?.invoke(value)
     }
 
-    private fun initRealKeyIfNeeded(thisRef: Item<*>, property: KProperty<*>) {
-        if (!this::realKey.isInitialized) {
-            realKey = if (key == USE_PROPERTY_NAME) {
-                "${thisRef::class.java.simpleName}.${property.name}"
-            } else {
-                key
-            }
-        }
+    internal fun initializeValue() {
+        getValueInternal()
     }
 
+    private fun getValueInternal(): T {
+        var property = properties.getPropertyEntry<T>(key)
+
+        if (property == null) {
+            property = ItemProperty(
+                key,
+                defaultValue(),
+                doHash
+            )
+
+            properties.setProperty(property)
+            onPropertySet?.invoke(property.value)
+        }
+
+        return property.value
+    }
 }
