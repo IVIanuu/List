@@ -13,7 +13,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val items = mutableListOf<String>()
+    private val titles = mutableListOf<String>()
 
     private var countItemCount = 0
 
@@ -21,16 +21,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        items.addAll((1..100).map { "Title: $it" })
+        titles.addAll((1..100).map { "Title: $it" })
 
         list.layoutManager = LinearLayoutManager(this)
 
         val controller = itemController {
-            ButtonItem().add {
+            ButtonItem {
                 buttonText = "Shuffle"
 
                 onClick {
-                    items.shuffle()
+                    titles.shuffle()
                     requestItemBuild()
                 }
             }
@@ -50,17 +50,17 @@ class MainActivity : AppCompatActivity() {
             ButtonItem {
                 buttonText = "Add Random"
                 onClick {
-                    items.add(0, "Random ${UUID.randomUUID()}")
+                    titles.add(0, "Random ${UUID.randomUUID()}")
                     requestItemBuild()
                 }
             }
 
-            items.forEach {
+            titles.forEach { title ->
                 SimpleItem {
-                    text = it
+                    text = title
                     onClick {
                         Toast.makeText(
-                            this@MainActivity, "Clicked item at $it",
+                            this@MainActivity, "Clicked item: $title",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                         itemView: View
                     ) {
                         super.onItemMoved(fromPosition, toPosition, itemBeingMoved, itemView)
-                        Collections.swap(items, fromPosition - 3, toPosition - 3)
+                        Collections.swap(titles, fromPosition - 3, toPosition - 3)
                         controller.requestItemBuild()
                     }
                 }
@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
                         direction: Int
                     ) {
                         super.onSwipeCompleted(item, itemView, position, direction)
-                        items.removeAt(position - 3)
+                        titles.removeAt(position - 3)
                         controller.requestItemBuild()
                     }
                 }
