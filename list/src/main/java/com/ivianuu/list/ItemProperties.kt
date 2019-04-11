@@ -36,6 +36,7 @@ class ItemProperties internal constructor() {
      * Returns the [ItemProperty] for the [key]
      */
     fun <T> getPropertyEntry(key: String): ItemProperty<T>? {
+        delegates[key]?.initializeValue()
         return _entries[key] as? ItemProperty<T>
     }
 
@@ -50,11 +51,11 @@ class ItemProperties internal constructor() {
     }
 
     internal fun itemAdded() {
-        itemAdded = true
         // force init the value of all delegates to have consistent equals() and hashCode() results
         delegates.values.toList()
             .forEach { it.itemAdded() }
         delegates.clear() // we don't need the delegate reference anymore
+        itemAdded = true
     }
 
     internal fun registerDelegate(key: String, delegate: ItemPropertyDelegate<*>) {

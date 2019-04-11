@@ -26,7 +26,7 @@ private object UNINITIALIZED
  */
 class ItemPropertyDelegate<T>(
     private val properties: ItemProperties,
-    internal val key: String,
+    private val key: String,
     private val doHash: Boolean = true,
     private val onPropertySet: ((T) -> Unit)? = null,
     private val defaultValue: () -> T
@@ -47,6 +47,10 @@ class ItemPropertyDelegate<T>(
         onPropertySet?.invoke(value)
     }
 
+    internal fun initializeValue() {
+        getOrInitializePropertyValue()
+    }
+
     internal fun itemAdded() {
         // lock down the value because it cannot change anymore at this point
         // this leads to faster reads because we don't need to query the property
@@ -63,7 +67,7 @@ class ItemPropertyDelegate<T>(
     }
 
     private fun getOrInitializePropertyValue(): T {
-        var property = properties.getPropertyEntry<T>(key)
+        var property = properties.entries[key] as? ItemProperty<T>
 
         // create the property if it doesn't exist yet
         if (property == null) {
