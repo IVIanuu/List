@@ -91,6 +91,17 @@ abstract class Item<H : Holder>(
     }
 
     /**
+     * Registers a property
+     */
+    protected fun <T> property(
+        key: String,
+        doHash: Boolean = true,
+        onPropertySet: ((T) -> Unit)? = null,
+        defaultValue: () -> T
+    ): ItemPropertyDelegate<T> =
+        ItemPropertyDelegate(properties, key, doHash, onPropertySet, defaultValue)
+
+    /**
      * Registers a required property which is also the id of this item
      */
     protected fun <T> idProperty(
@@ -103,17 +114,6 @@ abstract class Item<H : Holder>(
         }) {
             error("missing property with key '$key' use optionalProperty() for optional ones")
         }
-
-    /**
-     * Registers a property
-     */
-    protected fun <T> property(
-        key: String,
-        doHash: Boolean = true,
-        onPropertySet: ((T) -> Unit)? = null,
-        defaultValue: () -> T
-    ): ItemPropertyDelegate<T> =
-        ItemPropertyDelegate(properties, key, doHash, onPropertySet, defaultValue)
 
     /**
      * Registers a non null property
