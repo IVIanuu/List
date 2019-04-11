@@ -49,7 +49,7 @@ class ItemPropertyDelegate<T>(
 
     internal fun itemAdded() {
         // lock down the value because it cannot change anymore at this point
-        // this should lead to faster reads because we don't need to query the property
+        // this leads to faster reads because we don't need to query the property
         finalValue = getOrInitializePropertyValue()
     }
 
