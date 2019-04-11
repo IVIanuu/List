@@ -16,7 +16,6 @@
 
 package com.ivianuu.list
 
-import com.ivianuu.stdlibx.measureNanoTimeWithResult
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -36,7 +35,7 @@ class ItemPropertyDelegate<T>(
     private var finalValue: Any? = UNINITIALIZED
 
     init {
-        properties.registerDelegate(this)
+        properties.registerDelegate(key, this)
     }
 
     override fun getValue(thisRef: Item<*>, property: KProperty<*>): T {

@@ -57,9 +57,9 @@ class ItemProperties internal constructor() {
         delegates.clear() // we don't need the delegate reference anymore
     }
 
-    internal fun registerDelegate(delegate: ItemPropertyDelegate<*>) {
+    internal fun registerDelegate(key: String, delegate: ItemPropertyDelegate<*>) {
         check(!itemAdded) { "cannot change properties on added items" }
-        delegates[delegate.key] = delegate
+        delegates[key] = delegate
     }
 
     override fun equals(other: Any?): Boolean {

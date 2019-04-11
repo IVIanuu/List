@@ -98,8 +98,9 @@ abstract class Item<H : Holder>(
         doHash: Boolean = true,
         onPropertySet: ((T) -> Unit)? = null,
         defaultValue: () -> T
-    ): ItemPropertyDelegate<T> =
-        ItemPropertyDelegate(properties, key, doHash, onPropertySet, defaultValue)
+    ): ItemPropertyDelegate<T> {
+        return ItemPropertyDelegate(properties, key, doHash, onPropertySet, defaultValue)
+    }
 
     /**
      * Registers a required property which is also the id of this item
@@ -107,13 +108,14 @@ abstract class Item<H : Holder>(
     protected fun <T> idProperty(
         key: String,
         onPropertySet: ((T) -> Unit)? = null
-    ): ItemPropertyDelegate<T> =
-        ItemPropertyDelegate(properties, key, true, {
+    ): ItemPropertyDelegate<T> {
+        return ItemPropertyDelegate(properties, key, true, {
             id(it)
             onPropertySet?.invoke(it)
         }) {
             error("missing property with key '$key' use optionalProperty() for optional ones")
         }
+    }
 
     /**
      * Registers a non null property
@@ -122,8 +124,10 @@ abstract class Item<H : Holder>(
         key: String,
         doHash: Boolean = true,
         onPropertySet: ((T) -> Unit)? = null
-    ): ItemPropertyDelegate<T> = ItemPropertyDelegate(properties, key, doHash, onPropertySet) {
-        error("missing property with key '$key' use optionalProperty() for optional ones")
+    ): ItemPropertyDelegate<T> {
+        return ItemPropertyDelegate(properties, key, doHash, onPropertySet) {
+            error("missing property with key '$key' use optionalProperty() for optional ones")
+        }
     }
 
     /**
@@ -133,8 +137,9 @@ abstract class Item<H : Holder>(
         key: String,
         doHash: Boolean = true,
         onPropertySet: ((T?) -> Unit)? = null
-    ): ItemPropertyDelegate<T?> =
-        ItemPropertyDelegate(properties, key, doHash, onPropertySet) { null }
+    ): ItemPropertyDelegate<T?> {
+        return ItemPropertyDelegate(properties, key, doHash, onPropertySet) { null }
+    }
 
     /**
      * Adds the [listener]
