@@ -21,6 +21,7 @@ object Versions {
     const val androidGradlePlugin = "3.3.0"
     const val androidxAppCompat = "1.0.2"
     const val androidxRecyclerView = "1.0.0"
+    const val androidxTestJunit = "1.0.0"
     const val bintray = "1.8.4"
     const val closeable = "0.0.1-dev-2"
     const val junit = "4.12"
@@ -36,6 +37,7 @@ object Deps {
     const val androidxAppCompat = "androidx.appcompat:appcompat:${Versions.androidxAppCompat}"
     const val androidxRecyclerView =
         "androidx.recyclerview:recyclerview:${Versions.androidxRecyclerView}"
+    const val androidxTestJunit = "androidx.test.ext:junit:${Versions.androidxTestJunit}"
 
     const val bintrayGradlePlugin =
         "com.jfrog.bintray.gradle:gradle-bintray-plugin:${Versions.bintray}"

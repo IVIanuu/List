@@ -34,6 +34,7 @@ dependencies {
     api(Deps.kotlinStdLib)
     api(Deps.stdlibx)
 
+    testImplementation(Deps.androidxTestJunit)
     testImplementation(Deps.junit)
     testImplementation(Deps.roboelectric)
 }
