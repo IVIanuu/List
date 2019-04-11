@@ -27,7 +27,7 @@ object Versions {
     const val kotlin = "1.3.21"
     const val mavenGradle = "2.1"
     const val roboelectric = "4.0.2"
-    const val stdlibx = "0.0.1-dev-4"
+    const val stdlibx = "0.0.1-dev-5"
 }
 
 object Deps {

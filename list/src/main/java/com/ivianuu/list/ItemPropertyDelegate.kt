@@ -16,8 +16,11 @@
 
 package com.ivianuu.list
 
+import com.ivianuu.stdlibx.measureNanoTimeWithResult
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+
+private object UNINITIALIZED
 
 /**
  * Delegate which will be used to read and write [ItemProperties] in [Item]s
@@ -29,6 +32,8 @@ class ItemPropertyDelegate<T>(
     private val onPropertySet: ((T) -> Unit)? = null,
     private val defaultValue: () -> T
 ) : ReadWriteProperty<Item<*>, T> {
+
+    private var finalValue: Any? = UNINITIALIZED
 
     init {
         properties.registerDelegate(this)
@@ -43,13 +48,25 @@ class ItemPropertyDelegate<T>(
         onPropertySet?.invoke(value)
     }
 
-    internal fun initializeValue() {
-        getValueInternal()
+    internal fun itemAdded() {
+        // lock down the value because it cannot change anymore at this point
+        // this should lead to faster reads because we don't need to query the property
+        finalValue = getOrInitializePropertyValue()
     }
 
     private fun getValueInternal(): T {
+        // if we already got the final value return it otherwise read from the properties
+        return if (finalValue !== UNINITIALIZED) {
+            finalValue as T
+        } else {
+            getOrInitializePropertyValue()
+        }
+    }
+
+    private fun getOrInitializePropertyValue(): T {
         var property = properties.getPropertyEntry<T>(key)
 
+        // create the property if it doesn't exist yet
         if (property == null) {
             property = ItemProperty(
                 key,
