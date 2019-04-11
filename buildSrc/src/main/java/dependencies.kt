@@ -25,7 +25,7 @@ object Versions {
     const val bintray = "1.8.4"
     const val closeable = "0.0.1-dev-2"
     const val junit = "4.12"
-    const val kotlin = "1.3.21"
+    const val kotlin = "1.3.30"
     const val mavenGradle = "2.1"
     const val roboelectric = "4.0.2"
     const val stdlibx = "0.0.1-dev-5"
