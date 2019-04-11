@@ -23,43 +23,44 @@ import com.ivianuu.list.ItemEvents
 import com.ivianuu.list.addListener
 
 /**
- * [View] on click listener
+ * [View] on long click listener
  */
-typealias OnClickListener = (View) -> Unit
+typealias LongClickListener = (View) -> Boolean
 
 /**
- * Returns [ItemEvents] for view clicks
+ * Returns [ItemEvents] for view long clicks
  */
-fun <I : Item<H>, H : Holder> I.clicks(
+fun <I : Item<H>, H : Holder> I.longClicks(
     viewProvider: (H) -> View = { it.view }
-): Lazy<ItemEvents<OnClickListener>> = lazy(LazyThreadSafetyMode.NONE) {
-    ItemClicks(this, viewProvider)
+): Lazy<ItemEvents<LongClickListener>> = lazy(LazyThreadSafetyMode.NONE) {
+    ItemLongClicks(this, viewProvider)
 }
+
 
 /**
- * Returns [ItemEvents] for view clicks
+ * Returns [ItemEvents] for long clicks
  */
-fun <I : Item<H>, H : Holder> I.clicks(
+fun <I : Item<H>, H : Holder> I.longClicks(
     viewId: Int
-): Lazy<ItemEvents<OnClickListener>> = lazy(LazyThreadSafetyMode.NONE) {
-    ItemClicks(this) { it.view.findViewById(viewId) }
+): Lazy<ItemEvents<LongClickListener>> = lazy(LazyThreadSafetyMode.NONE) {
+    ItemLongClicks(this) { it.view.findViewById(viewId) }
 }
 
-private class ItemClicks<T : Item<H>, H : Holder>(
+private class ItemLongClicks<T : Item<H>, H : Holder>(
     private val item: T,
-    private val viewProvider: (H) -> View
-) : ItemEvents<OnClickListener> {
+    private val viewProvider: (H) -> View = { it.view }
+) : ItemEvents<(View) -> Boolean> {
 
-    private var _callback: ((view: View) -> Unit)? = null
+    private var _callback: ((View) -> Boolean)? = null
 
     init {
         item.addListener(
-            postBind = { _, holder -> viewProvider(holder as H).setOnClickListener(_callback) },
-            preUnbind = { _, holder -> viewProvider(holder as H).setOnClickListener(null) }
+            postBind = { _, holder -> viewProvider(holder as H).setOnLongClickListener(_callback) },
+            preUnbind = { _, holder -> viewProvider(holder as H).setOnLongClickListener(null) }
         )
     }
 
-    override fun setCallback(callback: (View) -> Unit) {
+    override fun setCallback(callback: (View) -> Boolean) {
         _callback = callback
     }
 }

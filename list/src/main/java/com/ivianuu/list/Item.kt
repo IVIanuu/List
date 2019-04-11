@@ -141,6 +141,11 @@ abstract class Item<H : Holder>(
         return ItemPropertyDelegate(properties, key, doHash, onPropertySet) { null }
     }
 
+    /** Calls trough [ItemEvents.setCallback] */
+    operator fun <T> ItemEvents<T>.invoke(block: T) {
+        setCallback(block)
+    }
+
     /**
      * Adds the [listener]
      */

@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.ivianuu.list.addItemListener
 import com.ivianuu.list.common.ItemTouchHelper
 import com.ivianuu.list.common.itemController
-import com.ivianuu.list.common.onClick
 import kotlinx.android.synthetic.main.activity_main.list
 import java.util.*
 
@@ -27,9 +26,10 @@ class MainActivity : AppCompatActivity() {
         list.layoutManager = LinearLayoutManager(this)
 
         val controller = itemController {
-            ButtonItem {
+            ButtonItem().add {
                 buttonText = "Shuffle"
-                onClick(R.id.button) { _, _ ->
+
+                onClick {
                     items.shuffle()
                     requestItemBuild()
                 }
@@ -37,11 +37,11 @@ class MainActivity : AppCompatActivity() {
 
             CountItem {
                 count = countItemCount
-                onClick(R.id.inc_button) { _, _ ->
+                onIncClick {
                     countItemCount++
                     requestItemBuild()
                 }
-                onClick(R.id.dec_button) { _, _ ->
+                onDecClick {
                     countItemCount--
                     requestItemBuild()
                 }
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
             ButtonItem {
                 buttonText = "Add Random"
-                onClick(R.id.button) { _, _ ->
+                onClick {
                     items.add(0, "Random ${UUID.randomUUID()}")
                     requestItemBuild()
                 }
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             items.forEach {
                 SimpleItem {
                     text = it
-                    onClick { _, _ ->
+                    onClick {
                         Toast.makeText(
                             this@MainActivity, "Clicked item at $it",
                             Toast.LENGTH_SHORT
