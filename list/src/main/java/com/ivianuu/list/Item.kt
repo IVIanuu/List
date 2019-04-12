@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.ivianuu.closeable.Closeable
+import java.util.*
 
 /**
  * Single item in a [ItemAdapter]
@@ -94,22 +95,22 @@ abstract class Item<H : Holder>(
      * Registers a property
      */
     protected fun <T> property(
-        key: String,
+        key: String? = null,
         doHash: Boolean = true,
         onPropertySet: ((T) -> Unit)? = null,
         defaultValue: () -> T
     ): ItemPropertyDelegate<T> {
-        return ItemPropertyDelegate(properties, key, doHash, onPropertySet, defaultValue)
+        return ItemPropertyDelegate(properties, key.orUUID(), doHash, onPropertySet, defaultValue)
     }
 
     /**
      * Registers a required property which is also the id of this item
      */
     protected fun <T> idProperty(
-        key: String,
+        key: String? = null,
         onPropertySet: ((T) -> Unit)? = null
     ): ItemPropertyDelegate<T> {
-        return ItemPropertyDelegate(properties, key, true, {
+        return ItemPropertyDelegate(properties, key.orUUID(), true, {
             id(it)
             onPropertySet?.invoke(it)
         }) {
@@ -121,11 +122,11 @@ abstract class Item<H : Holder>(
      * Registers a non null property
      */
     protected fun <T> requiredProperty(
-        key: String,
+        key: String? = null,
         doHash: Boolean = true,
         onPropertySet: ((T) -> Unit)? = null
     ): ItemPropertyDelegate<T> {
-        return ItemPropertyDelegate(properties, key, doHash, onPropertySet) {
+        return ItemPropertyDelegate(properties, key.orUUID(), doHash, onPropertySet) {
             error("missing property with key '$key' use optionalProperty() for optional ones")
         }
     }
@@ -134,11 +135,11 @@ abstract class Item<H : Holder>(
      * Registers a nullable property
      */
     protected fun <T> optionalProperty(
-        key: String,
+        key: String? = null,
         doHash: Boolean = true,
         onPropertySet: ((T?) -> Unit)? = null
     ): ItemPropertyDelegate<T?> {
-        return ItemPropertyDelegate(properties, key, doHash, onPropertySet) { null }
+        return ItemPropertyDelegate(properties, key.orUUID(), doHash, onPropertySet) { null }
     }
 
     /** Calls trough [ItemEvents.setCallback] */
@@ -234,6 +235,8 @@ abstract class Item<H : Holder>(
                 "properties=$properties" +
                 ")"
     }
+
+    private fun String?.orUUID() = this ?: UUID.randomUUID().toString()
 }
 
 /** Calls trough [ItemProperties.getProperty] */
