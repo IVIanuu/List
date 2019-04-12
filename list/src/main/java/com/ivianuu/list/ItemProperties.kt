@@ -55,7 +55,7 @@ class ItemProperties internal constructor() {
         delegates.values.toList()
             .forEach { it.itemAdded() }
         delegates.clear() // we don't need the delegate reference anymore
-        itemAdded = true
+        itemAdded = true // lock down to forbid further mutations
     }
 
     internal fun registerDelegate(key: String, delegate: ItemPropertyDelegate<*>) {

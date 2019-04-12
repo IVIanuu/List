@@ -39,7 +39,7 @@ class ItemPropertyDelegate<T>(
     }
 
     override fun getValue(thisRef: Item<*>, property: KProperty<*>): T {
-        return getValueInternal()
+        return getInternal()
     }
 
     override fun setValue(thisRef: Item<*>, property: KProperty<*>, value: T) {
@@ -48,25 +48,25 @@ class ItemPropertyDelegate<T>(
     }
 
     internal fun initializeValue() {
-        getOrInitializePropertyValue()
+        getFromItemProperties()
     }
 
     internal fun itemAdded() {
         // lock down the value because it cannot change anymore at this point
         // this leads to faster reads because we don't need to query the property
-        finalValue = getOrInitializePropertyValue()
+        finalValue = getFromItemProperties()
     }
 
-    private fun getValueInternal(): T {
+    private fun getInternal(): T {
         // if we already got the final value return it otherwise read from the properties
         return if (finalValue !== UNINITIALIZED) {
             finalValue as T
         } else {
-            getOrInitializePropertyValue()
+            getFromItemProperties()
         }
     }
 
-    private fun getOrInitializePropertyValue(): T {
+    private fun getFromItemProperties(): T {
         var property = properties.entries[key] as? ItemProperty<T>
 
         // create the property if it doesn't exist yet
