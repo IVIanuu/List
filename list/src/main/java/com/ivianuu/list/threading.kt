@@ -21,9 +21,33 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 
-internal val mainThreadHandler: Handler by lazy { createHandler(Looper.getMainLooper()) }
+private val mainThreadHandler: Handler by lazy { createHandler(Looper.getMainLooper()) }
 
-internal val backgroundHandler: Handler by lazy {
+internal fun mainThread(delayMs: Long = 0L, block: () -> Unit) {
+    mainThreadHandler.run(delayMs, block)
+}
+
+internal fun cancelMainThread(block: () -> Unit) {
+    mainThreadHandler.removeCallbacks(block)
+}
+
+internal fun backgroundThread(delayMs: Long = 0L, block: () -> Unit) {
+    backgroundHandler.run(delayMs, block)
+}
+
+internal fun cancelBackgroundThread(block: () -> Unit) {
+    backgroundHandler.removeCallbacks(block)
+}
+
+private fun Handler.run(delayMs: Long = 0L, block: () -> Unit) {
+    when {
+        delayMs != 0L -> postDelayed(block, delayMs)
+        Looper.myLooper() == looper -> block()
+        else -> post(block)
+    }
+}
+
+private val backgroundHandler: Handler by lazy {
     val handlerThread = HandlerThread("list:bg")
     handlerThread.start()
     createHandler(handlerThread.looper)
