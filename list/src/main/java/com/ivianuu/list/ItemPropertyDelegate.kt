@@ -29,8 +29,10 @@ class ItemPropertyDelegate<T>(
     private val key: String,
     private val doHash: Boolean = true,
     private val onPropertySet: ((T) -> Unit)? = null,
-    private val defaultValue: () -> T
+    defaultValue: () -> T
 ) : ReadWriteProperty<Item<*>, T> {
+
+    private var defaultValue: (() -> T)? = defaultValue
 
     private var finalValue: Any? = UNINITIALIZED
 
@@ -73,9 +75,11 @@ class ItemPropertyDelegate<T>(
         if (property == null) {
             property = ItemProperty(
                 key,
-                defaultValue(),
+                defaultValue!!(),
                 doHash
             )
+
+            defaultValue = null
 
             properties.setProperty(property)
             onPropertySet?.invoke(property.value)
