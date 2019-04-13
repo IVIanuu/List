@@ -47,8 +47,6 @@ internal class AsyncItemDiffer(private val resultCallback: (DiffResult) -> Unit)
         val runGeneration: Int
         val previousList: List<Item<*>>
 
-        println("diff: submit list $newList")
-
         synchronized(this) {
             // Incrementing generation means any currently-running diffs are discarded when they finish
             // We synchronize to guarantee list object and generation number are in sync
@@ -57,14 +55,12 @@ internal class AsyncItemDiffer(private val resultCallback: (DiffResult) -> Unit)
         }
 
         if (newList == previousList) {
-            println("diff: noop")
             // nothing to do
             onRunCompleted(runGeneration, newList, DiffResult.noop(previousList))
             return
         }
 
         if (newList.isEmpty()) {
-            println("diff: cleared")
             // fast simple clear all
             var result: DiffResult? = null
             if (!previousList.isEmpty()) {
@@ -75,7 +71,6 @@ internal class AsyncItemDiffer(private val resultCallback: (DiffResult) -> Unit)
         }
 
         if (previousList.isEmpty()) {
-            println("diff: insert from empty")
             // fast simple first insert
             onRunCompleted(runGeneration, newList, DiffResult.inserted(newList))
             return
@@ -84,7 +79,6 @@ internal class AsyncItemDiffer(private val resultCallback: (DiffResult) -> Unit)
         val callback = DiffCallback(previousList, newList)
 
         backgroundThread {
-            println("diff: perform diff")
             val result = DiffUtil.calculateDiff(callback)
             onRunCompleted(runGeneration, newList, DiffResult.diff(previousList, newList, result))
         }

@@ -57,7 +57,6 @@ abstract class ItemController {
      * Requests a call to [buildItems]
      */
     open fun requestItemBuild() {
-        println("request item build $hasBuiltItemsEver")
         if (hasBuiltItemsEver) {
             requestDelayedItemBuild(0)
         } else {
@@ -69,8 +68,6 @@ abstract class ItemController {
      * Enqueues a delayed call to [buildItems]
      */
     open fun requestDelayedItemBuild(delayMs: Long): Unit = synchronized(this) {
-        println("request delayed item build $delayMs")
-
         if (requestedItemBuildType == RequestedItemBuildType.DELAYED) {
             cancelPendingItemBuild()
         } else if (requestedItemBuildType == RequestedItemBuildType.NEXT_FRAME) {
