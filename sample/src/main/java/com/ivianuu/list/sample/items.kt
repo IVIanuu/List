@@ -24,6 +24,8 @@ import kotlinx.android.synthetic.main.item_button.button
 import kotlinx.android.synthetic.main.item_count.count
 import kotlinx.android.synthetic.main.item_simple.title
 
+class MyClass(val id: String, val other: Boolean)
+
 class ButtonItem : KotlinItem(layoutRes = R.layout.item_button) {
     var buttonText by idProperty<String>()
 

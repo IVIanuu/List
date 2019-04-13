@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.ivianuu.closeable.Closeable
 import java.util.*
+import kotlin.reflect.KProperty1
 
 /**
  * Single item in a [ItemAdapter]
@@ -107,11 +108,27 @@ abstract class Item<H : Holder>(
      * Registers a required property which is also the id of this item
      */
     protected fun <T> idProperty(
+        idProperty: KProperty1<T, Any?>,
         key: String? = null,
         onPropertySet: ((T) -> Unit)? = null
     ): ItemPropertyDelegate<T> {
+        return idProperty(key, onPropertySet) { idProperty.get(it) }
+    }
+
+    /**
+     * Registers a required property which is also the id of this item
+     */
+    protected fun <T> idProperty(
+        key: String? = null,
+        onPropertySet: ((T) -> Unit)? = null,
+        idSelector: ((T) -> Any?)? = null
+    ): ItemPropertyDelegate<T> {
         return ItemPropertyDelegate(properties, key.orUUID(), true, {
-            id(it)
+            if (idSelector != null) {
+                id(it)
+            } else {
+                id(it)
+            }
             onPropertySet?.invoke(it)
         }) {
             error("missing property with key '$key' use optionalProperty() for optional ones")
