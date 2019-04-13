@@ -19,9 +19,9 @@ object Publishing {
 
 object Versions {
     const val androidGradlePlugin = "3.3.0"
-    const val androidxAppCompat = "1.0.2"
-    const val androidxRecyclerView = "1.0.0"
-    const val androidxTestJunit = "1.0.0"
+    const val androidxAppCompat = "1.1.0-alpha04"
+    const val androidxRecyclerView = "1.1.0-alpha04"
+    const val androidxTestJunit = "1.2.0-alpha03"
     const val bintray = "1.8.4"
     const val closeable = "0.0.1-dev-2"
     const val junit = "4.12"
