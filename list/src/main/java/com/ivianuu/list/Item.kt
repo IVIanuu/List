@@ -277,7 +277,7 @@ fun <T> Item<*>.setProperty(
  * Sets the hashed version of [id] as the item id
  */
 fun Item<*>.id(id: Any?) {
-    this.id = id?.hashCode()?.toLong() ?: 0
+    this.id = itemIdFor(id)
 }
 
 /**
