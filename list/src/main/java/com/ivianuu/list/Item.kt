@@ -104,6 +104,7 @@ abstract class Item<H : Holder>(
         return ItemPropertyDelegate(properties, key.orUUID(), doHash, onPropertySet, defaultValue)
     }
 
+    // todo maybe remove
     /**
      * Registers a required property which is also the id of this item
      */
@@ -125,7 +126,7 @@ abstract class Item<H : Holder>(
     ): ItemPropertyDelegate<T> {
         return ItemPropertyDelegate(properties, key.orUUID(), true, {
             if (idSelector != null) {
-                id(it)
+                id(idSelector(it))
             } else {
                 id(it)
             }
