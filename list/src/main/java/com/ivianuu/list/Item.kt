@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.ivianuu.closeable.Closeable
 import java.util.*
-import kotlin.reflect.KProperty1
 
 /**
  * Single item in a [ItemAdapter]
@@ -102,18 +101,6 @@ abstract class Item<H : Holder>(
         defaultValue: () -> T
     ): ItemPropertyDelegate<T> {
         return ItemPropertyDelegate(properties, key.orUUID(), doHash, onPropertySet, defaultValue)
-    }
-
-    // todo maybe remove
-    /**
-     * Registers a required property which is also the id of this item
-     */
-    protected fun <T> idProperty(
-        idProperty: KProperty1<T, Any?>,
-        key: String? = null,
-        onPropertySet: ((T) -> Unit)? = null
-    ): ItemPropertyDelegate<T> {
-        return idProperty(key, onPropertySet) { idProperty.get(it) }
     }
 
     /**

@@ -14,14 +14,14 @@ object Build {
 object Publishing {
     const val groupId = "com.ivianuu.list"
     const val vcsUrl = "https://github.com/IVIanuu/list"
-    const val version = "${Build.versionName}-dev-25"
+    const val version = "${Build.versionName}-dev-26"
 }
 
 object Versions {
     const val androidGradlePlugin = "3.3.0"
     const val androidxAppCompat = "1.1.0-alpha04"
     const val androidxRecyclerView = "1.1.0-alpha04"
-    const val androidxTestJunit = "1.2.0-alpha03"
+    const val androidxTestJunit = "1.1.1-alpha03"
     const val bintray = "1.8.4"
     const val closeable = "0.0.1-dev-2"
     const val junit = "4.12"

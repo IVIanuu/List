@@ -16,18 +16,7 @@
 
 package com.ivianuu.list.common
 
-import android.view.View
-import com.ivianuu.list.Holder
 import com.ivianuu.list.Item
-import kotlinx.android.extensions.LayoutContainer
-
-/**
- * A [Holder] which is also a [LayoutContainer]
- */
-open class KotlinHolder : Holder(), LayoutContainer {
-    override val containerView: View
-        get() = view
-}
 
 /**
  * A [Item] which uses [KotlinHolder]s
