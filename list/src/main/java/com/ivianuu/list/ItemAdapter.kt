@@ -18,7 +18,6 @@ package com.ivianuu.list
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.ivianuu.closeable.Closeable
 import java.util.*
 
 /**
@@ -99,9 +98,8 @@ open class ItemAdapter : RecyclerView.Adapter<ItemViewHolder>() {
     /**
      * Adds the [listener] to all [Item]s
      */
-    fun addItemListener(listener: ItemListener): Closeable {
+    fun addItemListener(listener: ItemListener) {
         _itemListeners.add(listener)
-        return Closeable { removeItemListener(listener) }
     }
 
     /**

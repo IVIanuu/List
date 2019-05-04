@@ -16,8 +16,6 @@
 
 package com.ivianuu.list
 
-import com.ivianuu.closeable.Closeable
-
 /**
  * Controller of a underlying [ItemAdapter]
  */
@@ -120,8 +118,9 @@ abstract class ItemController {
     /**
      * Adds the [listener] to all [Item]s
      */
-    fun addItemListener(listener: ItemListener): Closeable =
+    fun addItemListener(listener: ItemListener) {
         adapter.addItemListener(listener)
+    }
 
     /**
      * Removes the previously added [listener]

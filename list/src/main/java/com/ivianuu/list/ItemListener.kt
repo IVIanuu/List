@@ -17,7 +17,6 @@
 package com.ivianuu.list
 
 import android.view.View
-import com.ivianuu.closeable.Closeable
 
 /**
  * Listener for [Item]s
@@ -44,22 +43,22 @@ interface ItemListener {
 
 }
 
-fun Item<*>.doOnCreateHolder(block: (item: Item<*>, holder: Holder) -> Unit): Closeable =
+fun Item<*>.doOnCreateHolder(block: (item: Item<*>, holder: Holder) -> Unit) =
     addListener(onCreateHolder = block)
 
-fun Item<*>.doOnBuildView(block: (item: Item<*>, view: View) -> Unit): Closeable =
+fun Item<*>.doOnBuildView(block: (item: Item<*>, view: View) -> Unit) =
     addListener(onBuildView = block)
 
-fun Item<*>.doOnPreBind(block: (item: Item<*>, holder: Holder) -> Unit): Closeable =
+fun Item<*>.doOnPreBind(block: (item: Item<*>, holder: Holder) -> Unit) =
     addListener(preBind = block)
 
-fun Item<*>.doOnPostBind(block: (item: Item<*>, holder: Holder) -> Unit): Closeable =
+fun Item<*>.doOnPostBind(block: (item: Item<*>, holder: Holder) -> Unit) =
     addListener(postBind = block)
 
-fun Item<*>.doOnPreUnbind(block: (item: Item<*>, holder: Holder) -> Unit): Closeable =
+fun Item<*>.doOnPreUnbind(block: (item: Item<*>, holder: Holder) -> Unit) =
     addListener(preUnbind = block)
 
-fun Item<*>.doOnPostUnbind(block: (item: Item<*>, holder: Holder) -> Unit): Closeable =
+fun Item<*>.doOnPostUnbind(block: (item: Item<*>, holder: Holder) -> Unit) =
     addListener(postUnbind = block)
 
 fun Item<*>.addListener(
@@ -69,7 +68,7 @@ fun Item<*>.addListener(
     postBind: ((item: Item<*>, holder: Holder) -> Unit)? = null,
     preUnbind: ((item: Item<*>, holder: Holder) -> Unit)? = null,
     postUnbind: ((item: Item<*>, holder: Holder) -> Unit)? = null
-): Closeable = ItemListener(
+) = ItemListener(
     onCreateHolder,
     onBuildView,
     preBind, postBind,
@@ -83,7 +82,7 @@ fun ItemAdapter.addItemListener(
     postBind: ((item: Item<*>, holder: Holder) -> Unit)? = null,
     preUnbind: ((item: Item<*>, holder: Holder) -> Unit)? = null,
     postUnbind: ((item: Item<*>, holder: Holder) -> Unit)? = null
-): Closeable = ItemListener(
+) = ItemListener(
     onCreateHolder,
     onBuildView,
     preBind, postBind,
@@ -97,7 +96,7 @@ fun ItemController.addItemListener(
     postBind: ((item: Item<*>, holder: Holder) -> Unit)? = null,
     preUnbind: ((item: Item<*>, holder: Holder) -> Unit)? = null,
     postUnbind: ((item: Item<*>, holder: Holder) -> Unit)? = null
-): Closeable = ItemListener(
+) = ItemListener(
     onCreateHolder,
     onBuildView,
     preBind, postBind,

@@ -14,7 +14,7 @@ object Build {
 object Publishing {
     const val groupId = "com.ivianuu.list"
     const val vcsUrl = "https://github.com/IVIanuu/list"
-    const val version = "${Build.versionName}-dev-26"
+    const val version = "${Build.versionName}-dev-27"
 }
 
 object Versions {
@@ -23,12 +23,10 @@ object Versions {
     const val androidxRecyclerView = "1.1.0-alpha04"
     const val androidxTestJunit = "1.1.1-alpha03"
     const val bintray = "1.8.4"
-    const val closeable = "0.0.1-dev-2"
     const val junit = "4.12"
-    const val kotlin = "1.3.30"
+    const val kotlin = "1.3.31"
     const val mavenGradle = "2.1"
     const val roboelectric = "4.0.2"
-    const val stdlibx = "0.0.1-dev-5"
 }
 
 object Deps {
@@ -42,8 +40,6 @@ object Deps {
     const val bintrayGradlePlugin =
         "com.jfrog.bintray.gradle:gradle-bintray-plugin:${Versions.bintray}"
 
-    const val closeable = "com.ivianuu.closeable:closeable:${Versions.closeable}"
-
     const val junit = "junit:junit:${Versions.junit}"
 
     const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
@@ -53,7 +49,5 @@ object Deps {
         "com.github.dcendents:android-maven-gradle-plugin:${Versions.mavenGradle}"
 
     const val roboelectric = "org.robolectric:robolectric:${Versions.roboelectric}"
-
-    const val stdlibx = "com.ivianuu.stdlibx:stdlibx:${Versions.stdlibx}"
 
 }

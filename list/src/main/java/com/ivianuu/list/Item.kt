@@ -19,7 +19,6 @@ package com.ivianuu.list
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.ivianuu.closeable.Closeable
 import java.util.*
 
 /**
@@ -155,9 +154,8 @@ abstract class Item<H : Holder>(
     /**
      * Adds the [listener]
      */
-    fun addListener(listener: ItemListener): Closeable {
+    fun addListener(listener: ItemListener) {
         listeners.add(listener)
-        return Closeable { removeListener(listener) }
     }
 
     /**
