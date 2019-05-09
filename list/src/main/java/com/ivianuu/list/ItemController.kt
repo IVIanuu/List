@@ -115,32 +115,11 @@ abstract class ItemController {
         currentItems.add(item)
     }
 
-    /**
-     * Adds the [listener] to all [Item]s
-     */
-    fun addItemListener(listener: ItemListener) {
-        adapter.addItemListener(listener)
-    }
+    inline fun <T : Item<*>> T.add(block: T.() -> Unit): T =
+        apply(block).addTo(this@ItemController)
 
-    /**
-     * Removes the previously added [listener]
-     */
-    fun removeItemListener(listener: ItemListener) {
-        adapter.removeItemListener(listener)
-    }
-
-    inline operator fun <T : Item<*>> ItemFactory<T>.invoke(
-        body: T.() -> Unit
-    ): T = create().apply(body).addTo(this@ItemController)
-
-    inline operator fun <T : Item<*>> T.invoke(body: T.() -> Unit): T =
-        apply(body).addTo(this@ItemController)
-
-    inline fun <T : Item<*>> T.add(body: T.() -> Unit): T =
-        apply(body).addTo(this@ItemController)
-
-    inline fun <T : Item<*>> T.addIt(body: (T) -> Unit): T =
-        apply(body).addTo(this@ItemController)
+    inline fun <T : Item<*>> T.addIt(block: (T) -> Unit): T =
+        apply(block).addTo(this@ItemController)
 
     private enum class RequestedItemBuildType {
         NONE, NEXT_FRAME, DELAYED

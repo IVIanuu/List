@@ -19,47 +19,57 @@ package com.ivianuu.list.common
 import android.view.View
 import com.ivianuu.list.Holder
 import com.ivianuu.list.Item
-import com.ivianuu.list.ItemEvents
-import com.ivianuu.list.addListener
 
 /**
  * [View] on click listener
  */
-typealias OnClickListener = (View) -> Unit
+typealias OnClick = (View) -> Unit
+
+fun <I : Item<H>, H : Holder> I.clicks(id: Int, onClick: OnClick) {
+    clicks({ it.view.findViewById(id) }, onClick)
+}
+
+fun <I : Item<H>, H : Holder> I.clicks(viewProvider: (H) -> View, onClick: OnClick) {
+    addListener(
+        postBind = { _, holder -> viewProvider(holder as H).setOnClickListener(onClick) },
+        preUnbind = { _, holder -> viewProvider(holder as H).setOnClickListener(null) }
+    )
+}
 
 /**
+/**
  * Returns [ItemEvents] for view clicks
- */
+*/
 fun <I : Item<H>, H : Holder> I.clicks(
-    viewProvider: (H) -> View = { it.view }
-): Lazy<ItemEvents<OnClickListener>> = lazy(LazyThreadSafetyMode.NONE) {
-    ItemClicks(this, viewProvider)
+viewProvider: (H) -> View = { it.view }
+): Lazy<ItemEvents<OnClick>> = lazy(LazyThreadSafetyMode.NONE) {
+ItemClicks(this, viewProvider)
 }
 
 /**
  * Returns [ItemEvents] for view clicks
- */
+*/
 fun <I : Item<H>, H : Holder> I.clicks(
-    viewId: Int
-): Lazy<ItemEvents<OnClickListener>> = lazy(LazyThreadSafetyMode.NONE) {
-    ItemClicks(this) { it.view.findViewById(viewId) }
+viewId: Int
+): Lazy<ItemEvents<OnClick>> = lazy(LazyThreadSafetyMode.NONE) {
+ItemClicks(this) { it.view.findViewById(viewId) }
 }
 
 private class ItemClicks<T : Item<H>, H : Holder>(
-    private val item: T,
-    private val viewProvider: (H) -> View
-) : ItemEvents<OnClickListener> {
+private val item: T,
+private val viewProvider: (H) -> View
+) : ItemEvents<OnClick> {
 
-    private var _callback: ((view: View) -> Unit)? = null
+private var _callback: ((view: View) -> Unit)? = null
 
-    init {
-        item.addListener(
-            postBind = { _, holder -> viewProvider(holder as H).setOnClickListener(_callback) },
-            preUnbind = { _, holder -> viewProvider(holder as H).setOnClickListener(null) }
-        )
-    }
-
-    override fun setCallback(callback: (View) -> Unit) {
-        _callback = callback
-    }
+init {
+item.addListener(
+postBind = { _, holder -> viewProvider(holder as H).setOnClickListener(_callback) },
+preUnbind = { _, holder -> viewProvider(holder as H).setOnClickListener(null) }
+)
 }
+
+override fun setCallback(callback: (View) -> Unit) {
+_callback = callback
+}
+}*/

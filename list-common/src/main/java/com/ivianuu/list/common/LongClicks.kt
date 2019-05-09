@@ -16,12 +16,7 @@
 
 package com.ivianuu.list.common
 
-import android.view.View
-import com.ivianuu.list.Holder
-import com.ivianuu.list.Item
-import com.ivianuu.list.ItemEvents
-import com.ivianuu.list.addListener
-
+/**
 /**
  * [View] on long click listener
  */
@@ -63,4 +58,4 @@ private class ItemLongClicks<T : Item<H>, H : Holder>(
     override fun setCallback(callback: (View) -> Boolean) {
         _callback = callback
     }
-}
+}*/

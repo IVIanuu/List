@@ -16,52 +16,34 @@
 
 package com.ivianuu.list.sample
 
-import com.ivianuu.list.ItemFactory
-import com.ivianuu.list.common.KotlinHolder
-import com.ivianuu.list.common.KotlinItem
-import com.ivianuu.list.common.clicks
+import com.ivianuu.list.ItemController
 import kotlinx.android.synthetic.main.item_button.button
-import kotlinx.android.synthetic.main.item_count.count
+import kotlinx.android.synthetic.main.item_count.count_text
+import kotlinx.android.synthetic.main.item_count.dec_button
+import kotlinx.android.synthetic.main.item_count.inc_button
 import kotlinx.android.synthetic.main.item_simple.title
 
-class MyClass(val id: String, val other: Boolean)
-
-class ButtonItem : KotlinItem(layoutRes = R.layout.item_button) {
-    var buttonText by idProperty<String>()
-
-    val onClick by clicks(R.id.button)
-
-    override fun bind(holder: KotlinHolder) {
-        super.bind(holder)
-        holder.button.text = buttonText
+fun ItemController.ButtonItem(text: String, onClick: () -> Unit) =
+    item(id = text, layoutRes = R.layout.item_button) {
+        button.text = text
+        button.setOnClickListener { onClick() }
     }
 
-    companion object : ItemFactory<ButtonItem>(::ButtonItem)
+fun ItemController.CountItem(count: Int, onIncClick: () -> Unit, onDecClick: () -> Unit) = item(
+    id = "count",
+    layoutRes = R.layout.item_count,
+    properties = listOf(count)
+) {
+    count_text.text = "Count is $count"
+    inc_button.setOnClickListener { onIncClick() }
+    dec_button.setOnClickListener { onDecClick() }
 }
 
-class CountItem : KotlinItem(id = "count", layoutRes = R.layout.item_count) {
-    var count by requiredProperty<Int>()
-
-    val onIncClick by clicks(R.id.inc_button)
-    val onDecClick by clicks(R.id.dec_button)
-
-    override fun bind(holder: KotlinHolder) {
-        super.bind(holder)
-        holder.count.text = "Count is $count"
+fun ItemController.SimpleItem(text: String, onClick: () -> Unit) = item {
+    id(text)
+    layoutRes(R.layout.item_simple)
+    bind {
+        title.text = text
+        containerView.setOnClickListener { onClick() }
     }
-
-    companion object : ItemFactory<CountItem>(::CountItem)
-}
-
-class SimpleItem : KotlinItem(layoutRes = R.layout.item_simple) {
-    var text by idProperty<String>()
-
-    val onClick by clicks()
-
-    override fun bind(holder: KotlinHolder) {
-        super.bind(holder)
-        holder.title.text = text
-    }
-
-    companion object : ItemFactory<SimpleItem>(::SimpleItem)
 }

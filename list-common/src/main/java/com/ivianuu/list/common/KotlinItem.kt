@@ -23,7 +23,8 @@ import com.ivianuu.list.Item
  */
 abstract class KotlinItem(
     id: Any? = null,
-    layoutRes: Int = -1
-) : Item<KotlinHolder>(id, layoutRes) {
+    layoutRes: Int = -1,
+    properties: Iterable<Any?>? = null
+) : Item<KotlinHolder>(id, layoutRes, properties) {
     override fun createHolder(): KotlinHolder = KotlinHolder()
 }

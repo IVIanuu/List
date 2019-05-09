@@ -32,9 +32,6 @@ open class ItemAdapter : RecyclerView.Adapter<ItemViewHolder>() {
      */
     val currentItems: List<Item<*>> get() = differ.currentList
 
-    internal val itemListeners get() = _itemListeners
-    private val _itemListeners = mutableSetOf<ItemListener>()
-
     private var lastItemForViewTypeLookup: Item<*>? = null
 
     init {
@@ -80,8 +77,7 @@ open class ItemAdapter : RecyclerView.Adapter<ItemViewHolder>() {
      * this adapter
      */
     fun setItems(items: List<Item<*>>) {
-        items.checkDuplicates()
-        items.forEach { it.addedToAdapter(this) }
+        items.check()
         differ.submitList(items)
     }
 
@@ -90,23 +86,18 @@ open class ItemAdapter : RecyclerView.Adapter<ItemViewHolder>() {
      * And does not notify any changes to this adapter
      */
     fun overrideItems(items: List<Item<*>>) {
-        items.checkDuplicates()
-        items.forEach { it.addedToAdapter(this) }
+        items.check()
         differ.forceListOverride(items)
     }
 
-    /**
-     * Adds the [listener] to all [Item]s
-     */
-    fun addItemListener(listener: ItemListener) {
-        _itemListeners.add(listener)
+    private fun List<Item<*>>.check() {
+        checkHasId()
+        checkDuplicates()
     }
 
-    /**
-     * Removes the previously added [listener]
-     */
-    fun removeItemListener(listener: ItemListener) {
-        _itemListeners.remove(listener)
+    private fun List<Item<*>>.checkHasId() {
+        filter { it.id != 0L }
+            .forEach { error("id must be set $it") }
     }
 
     private fun List<Item<*>>.checkDuplicates() {

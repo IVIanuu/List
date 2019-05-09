@@ -17,9 +17,10 @@
 package com.ivianuu.list.common
 
 import androidx.recyclerview.widget.GridLayoutManager
-import com.ivianuu.list.*
-
-private const val KEY_SPAN_SIZE_OVERRIDE = "ItemSpanSizeLookUp.spanSizeOverride"
+import com.ivianuu.list.Item
+import com.ivianuu.list.ItemAdapter
+import com.ivianuu.list.ItemController
+import com.ivianuu.list.getItemAt
 
 /**
  * Callback to provide the span size of a specific [Item]
@@ -48,21 +49,8 @@ class ItemSpanSizeLookup(
         val item = adapter.getItemAt(position)
         val spanCount = layoutManager.spanCount
         val itemCount = adapter.itemCount
-        val spanSizeOverride = item.getProperty<SpanSizeProvider>(KEY_SPAN_SIZE_OVERRIDE)
-        return spanSizeOverride?.getSpanSize(spanCount, position, itemCount)
-            ?: (item as? SpanSizeProvider)?.getSpanSize(spanCount, position, itemCount)
+        return (item as? SpanSizeProvider)?.getSpanSize(spanCount, position, itemCount)
             ?: defaultSpanSize
     }
 
-}
-
-fun Item<*>.overrideSpanSize(provider: SpanSizeProvider?) {
-    setProperty(KEY_SPAN_SIZE_OVERRIDE, provider, false)
-}
-
-fun Item<*>.overrideSpanSize(callback: (totalSpanCount: Int, position: Int, itemCount: Int) -> Int) {
-    overrideSpanSize(object : SpanSizeProvider {
-        override fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int =
-            callback.invoke(totalSpanCount, position, itemCount)
-    })
 }

@@ -5,7 +5,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ivianuu.list.addItemListener
+import com.ivianuu.list.Item
+import com.ivianuu.list.addTo
 import com.ivianuu.list.common.ItemTouchHelper
 import com.ivianuu.list.common.itemController
 import kotlinx.android.synthetic.main.activity_main.list
@@ -26,45 +27,35 @@ class MainActivity : AppCompatActivity() {
         list.layoutManager = LinearLayoutManager(this)
 
         val controller = itemController {
-            ButtonItem {
-                buttonText = "Shuffle"
+            ButtonItem(text = "Shuffle", onClick = {
+                titles.shuffle()
+                requestItemBuild()
+            })
 
-                onClick {
-                    titles.shuffle()
-                    requestItemBuild()
-                }
-            }
-
-            CountItem {
-                count = countItemCount
-                onIncClick {
+            CountItem(
+                count = countItemCount,
+                onIncClick = {
                     countItemCount++
                     requestItemBuild()
-                }
-                onDecClick {
+                },
+                onDecClick = {
                     countItemCount--
                     requestItemBuild()
                 }
-            }
+            )
 
-            ButtonItem {
-                buttonText = "Add Random"
-                onClick {
-                    titles.add(0, "Random ${UUID.randomUUID()}")
-                    requestItemBuild()
-                }
-            }
+            ButtonItem(text = "Add Random", onClick = {
+                titles.add(0, "Random ${UUID.randomUUID()}")
+                requestItemBuild()
+            }).addTo(this)
 
             titles.forEach { title ->
-                SimpleItem {
-                    text = title
-                    onClick {
-                        Toast.makeText(
-                            this@MainActivity, "Clicked item: $title",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+                SimpleItem(text = title, onClick = {
+                    Toast.makeText(
+                        this@MainActivity, "Clicked item: $title",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                })
             }
         }
 
@@ -81,13 +72,22 @@ class MainActivity : AppCompatActivity() {
 
         ItemTouchHelper.dragging(list)
             .vertical()
-            .target(SimpleItem::class)
+            .target(Item::class)
             .callbacks(
-                object : ItemTouchHelper.DragCallbacks<SimpleItem>() {
+                object : ItemTouchHelper.DragCallbacks<Item<*>>() {
+                    // todo
+                    override fun getMovementFlagsForItem(item: Item<*>, adapterPosition: Int): Int {
+                        return if (item.viewType == R.layout.item_simple) {
+                            super.getMovementFlagsForItem(item, adapterPosition)
+                        } else {
+                            0
+                        }
+                    }
+
                     override fun onItemMoved(
                         fromPosition: Int,
                         toPosition: Int,
-                        itemBeingMoved: SimpleItem,
+                        itemBeingMoved: Item<*>,
                         itemView: View
                     ) {
                         super.onItemMoved(fromPosition, toPosition, itemBeingMoved, itemView)
@@ -99,11 +99,20 @@ class MainActivity : AppCompatActivity() {
 
         ItemTouchHelper.swiping(list)
             .leftAndRight()
-            .target(SimpleItem::class)
+            .target(Item::class)
             .callbacks(
-                object : ItemTouchHelper.SwipeCallbacks<SimpleItem>() {
+                object : ItemTouchHelper.SwipeCallbacks<Item<*>>() {
+                    // todo
+                    override fun getMovementFlagsForItem(item: Item<*>, adapterPosition: Int): Int {
+                        return if (item.viewType == R.layout.item_simple) {
+                            super.getMovementFlagsForItem(item, adapterPosition)
+                        } else {
+                            0
+                        }
+                    }
+
                     override fun onSwipeCompleted(
-                        item: SimpleItem,
+                        item: Item<*>,
                         itemView: View,
                         position: Int,
                         direction: Int
