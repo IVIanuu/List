@@ -36,7 +36,7 @@ abstract class ItemController {
 
     @Volatile private var hasBuiltItemsEver = false
 
-    private val buildItemsAction: () -> Unit = {
+    private val buildItemsAction = Runnable {
         cancelPendingItemBuild()
 
         isBuildingItems = true
@@ -58,7 +58,7 @@ abstract class ItemController {
         if (hasBuiltItemsEver) {
             requestDelayedItemBuild(0)
         } else {
-            buildItemsAction()
+            buildItemsAction.run()
         }
     }
 

@@ -23,26 +23,26 @@ import android.os.Looper
 
 private val mainThreadHandler: Handler by lazy { createHandler(Looper.getMainLooper()) }
 
-internal fun mainThread(delayMs: Long = 0L, block: () -> Unit) {
+internal fun mainThread(delayMs: Long = 0L, block: Runnable) {
     mainThreadHandler.run(delayMs, block)
 }
 
-internal fun cancelMainThread(block: () -> Unit) {
+internal fun cancelMainThread(block: Runnable) {
     mainThreadHandler.removeCallbacks(block)
 }
 
-internal fun backgroundThread(delayMs: Long = 0L, block: () -> Unit) {
+internal fun backgroundThread(delayMs: Long = 0L, block: Runnable) {
     backgroundHandler.run(delayMs, block)
 }
 
-internal fun cancelBackgroundThread(block: () -> Unit) {
+internal fun cancelBackgroundThread(block: Runnable) {
     backgroundHandler.removeCallbacks(block)
 }
 
-private fun Handler.run(delayMs: Long = 0L, block: () -> Unit) {
+private fun Handler.run(delayMs: Long = 0L, block: Runnable) {
     when {
         delayMs != 0L -> postDelayed(block, delayMs)
-        Looper.myLooper() == looper -> block()
+        Looper.myLooper() == looper -> block.run()
         else -> post(block)
     }
 }

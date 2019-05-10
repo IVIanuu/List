@@ -78,10 +78,10 @@ internal class AsyncItemDiffer(private val resultCallback: (DiffResult) -> Unit)
 
         val callback = DiffCallback(previousList, newList)
 
-        backgroundThread {
+        backgroundThread(block = Runnable {
             val result = DiffUtil.calculateDiff(callback)
             onRunCompleted(runGeneration, newList, DiffResult.diff(previousList, newList, result))
-        }
+        })
     }
 
     private fun onRunCompleted(
@@ -91,12 +91,12 @@ internal class AsyncItemDiffer(private val resultCallback: (DiffResult) -> Unit)
     ) {
         // We use an asynchronous handler so that the Runnable can be posted directly back to the main
         // thread without waiting on view invalidation synchronization.
-        mainThread {
+        mainThread(block = Runnable {
             val dispatchResult = tryLatchList(newList, runGeneration)
             if (result != null && dispatchResult) {
                 resultCallback(result)
             }
-        }
+        })
     }
 
     private fun tryLatchList(
